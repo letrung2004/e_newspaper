@@ -13,17 +13,13 @@ const ReaderHeader = () => {
                             <div className="left-topbar">
                                 <span className="left-topbar-item flex-wr-s-c">
                                     <span>Việt Nam</span>
-
-
-
                                     <span className="left-topbar-item">{new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
-
                                 </span>
 
                                 <Link to="#" className="left-topbar-item">Về chúng tôi</Link>
                                 <Link to="#" className="left-topbar-item">Liên Hệ</Link>
-                                <Link to="#" className="left-topbar-item">Đăng ký</Link>
-                                <Link to="#" className="left-topbar-item">Đăng nhập</Link>
+                                <Link to="/register" className="left-topbar-item">Đăng ký</Link>
+                                <Link to="/login" className="left-topbar-item">Đăng nhập</Link>
                             </div>
 
                             <div className="right-topbar">
@@ -51,7 +47,7 @@ const ReaderHeader = () => {
 
                     <div className="wrap-logo no-banner container">
                         <div className="logo">
-                            <a href="index.html"><img src="/assets/images/icons/logo-01.png" alt="LOGO" /></a>
+                            <a href="/"><img src="/assets/images/icons/logo-01.png" alt="LOGO" /></a>
                         </div>
                     </div>
 
@@ -63,38 +59,51 @@ const ReaderHeader = () => {
                                     <img src="/assets/images/icons/logo-01.png" alt="LOGO" />
                                 </Link>
 
-                                <ul className="main-menu">
-                                    <li className="main-menu-active">
-                                        <Link to="/">Home</Link>
-                                        <ul className="sub-menu">
-                                            <li><Link to="/">Homepage v1</Link></li>
-                                            <li><Link to="#">Homepage v2</Link></li>
-                                            <li><Link to="#">Homepage v3</Link></li>
-                                        </ul>
-                                    </li>
+                                <div className="scrollable-menu">
+                                    <ul className="main-menu">
+                                        <li className="main-menu-active">
+                                            <Link to="/">Home</Link>
+                                            <ul className="sub-menu">
+                                                <li><Link to="/">Homepage v1</Link></li>
+                                                <li><Link to="#">Homepage v2</Link></li>
+                                                <li><Link to="#">Homepage v3</Link></li>
+                                            </ul>
+                                        </li>
 
-                                    <li className="mega-menu-item"><Link to="#">News</Link></li>
-                                    <li className="mega-menu-item"><Link to="#">Entertainment</Link></li>
-                                    <li className="mega-menu-item"><Link to="#">Business</Link></li>
-                                    <li className="mega-menu-item"><Link to="#">Travel</Link></li>
-                                    <li className="mega-menu-item"><Link to="#">Life Style</Link></li>
-                                    <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">News</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Entertainment</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Business</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Travel</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Life Style</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
+                                        <li className="mega-menu-item"><Link to="#">Video</Link></li>
 
-                                    <li>
-                                        <Link to="#">Features</Link>
-                                        <ul className="sub-menu">
-                                            <li><Link to="#">Category Page v1</Link></li>
-                                            <li><Link to="#">Category Page v2</Link></li>
-                                            <li><Link to="#">Blog Grid Sidebar</Link></li>
-                                            <li><Link to="#">Blog List Sidebar v1</Link></li>
-                                            <li><Link to="#">Blog List Sidebar v2</Link></li>
-                                            <li><Link to="#">Blog Detail Sidebar</Link></li>
-                                            <li><Link to="#">Blog Detail No Sidebar</Link></li>
-                                            <li><Link to="#">About Us</Link></li>
-                                            <li><Link to="#">Contact Us</Link></li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                                        <li>
+                                            <Link to="#">Features</Link>
+                                            <ul className="sub-menu">
+                                                <li><Link to="#">Category Page v1</Link></li>
+                                                <li><Link to="#">Category Page v2</Link></li>
+                                                <li><Link to="#">Blog Grid Sidebar</Link></li>
+                                                <li><Link to="#">Blog List Sidebar v1</Link></li>
+                                                <li><Link to="#">Blog List Sidebar v2</Link></li>
+                                                <li><Link to="#">Blog Detail Sidebar</Link></li>
+                                                <li><Link to="#">Blog Detail No Sidebar</Link></li>
+                                                <li><Link to="#">About Us</Link></li>
+                                                <li><Link to="#">Contact Us</Link></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+
+
+
                             </nav>
                         </div>
                     </div>

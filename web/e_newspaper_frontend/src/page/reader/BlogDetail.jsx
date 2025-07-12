@@ -52,9 +52,17 @@ const BlogDetail = () => {
                                         <span className="f1-s-3 cl8 m-r-15">5239 Views</span>
                                         <Link to="#" onClick={preventDefault} className="f1-s-3 cl8 hov-cl10 trans-03 m-r-15">0 Comment</Link>
                                     </div>
+
+                                    <audio controls className="w-full my-4">
+                                        <source src="/assets/audio/sample-news.mp3" type="audio/mpeg" />
+                                        Your browser does not support the audio element.
+                                    </audio>
+
+
                                     <div className="wrap-pic-max-w p-b-30">
                                         <img src="/assets/images/blog-list-01.jpg" alt="IMG" />
                                     </div>
+
                                     <p className="f1-s-11 cl6 p-b-25">
                                         Curabitur volutpat bibendum molestie... Maecenas elementum arcu eu convallis rhoncus.
                                     </p>
