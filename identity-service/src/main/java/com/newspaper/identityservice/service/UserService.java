@@ -8,6 +8,7 @@ import com.newspaper.identityservice.enums.Role;
 import com.newspaper.identityservice.exception.AppException;
 import com.newspaper.identityservice.exception.ErrorCode;
 import com.newspaper.identityservice.mapper.UserMapper;
+import com.newspaper.identityservice.repository.RoleRepository;
 import com.newspaper.identityservice.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    RoleRepository roleRepository;
 
     public UserResponse createUser(UserCreationRequest request) {
 
@@ -38,11 +40,6 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-//        HashSet<String> roles = new HashSet<>();
-//        roles.add(Role.USER.name());
-//
-//        user.setRoles(roles);
-
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
@@ -51,6 +48,10 @@ public class UserService {
                 orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        var role = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(role));
         return userMapper.toUserResponse(user);
     }
 
