@@ -23,7 +23,7 @@ The AI-powered smart notification system **summarizes** and **converts article t
 
 ##  Main services
 
-| Service             | Mô tả                          | Database   |
+| Service             | Description                          | Database   |
 |---------------------|----------------------------------|------------|
 | API Gateway         | Request routing              | -          |
 | Identity Service    | User account management    | MySQL      |
