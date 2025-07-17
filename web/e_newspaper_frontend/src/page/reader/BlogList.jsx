@@ -47,7 +47,7 @@ const BlogList = () => {
                                                 </h5>
 
                                                 <div className="cl8 p-b-18">
-                                                    <a href="#" onClick={(e) => e.preventDefault()} className="f1-s-4 cl8 hov-cl10 trans-03">
+                                                    <a href="/" onClick={(e) => e.preventDefault()} className="f1-s-4 cl8 hov-cl10 trans-03">
                                                         by John Alvarado
                                                     </a>
                                                     <span className="f1-s-3 m-rl-3">-</span>
@@ -66,7 +66,7 @@ const BlogList = () => {
                                     ))}
                                 </div>
 
-                                <a href="#" onClick={(e) => e.preventDefault()} className="flex-c-c size-a-13 bo-all-1 bocl11 f1-m-6 cl6 hov-btn1 trans-03">
+                                <a href="/" onClick={(e) => e.preventDefault()} className="flex-c-c size-a-13 bo-all-1 bocl11 f1-m-6 cl6 hov-btn1 trans-03">
                                     Load More
                                 </a>
                             </div>
@@ -82,7 +82,7 @@ const BlogList = () => {
                                         {[1, 2, 3, 4, 5].map((num, i) => (
                                             <li className="flex-wr-sb-s p-b-22" key={i}>
                                                 <div className="size-a-8 flex-c-c borad-3 size-a-8 bg9 f1-m-4 cl0 m-b-6">{num}</div>
-                                                <a href="#" onClick={(e) => e.preventDefault()} className="size-w-3 f1-s-7 cl3 hov-cl10 trans-03">
+                                                <a href="/" onClick={(e) => e.preventDefault()} className="size-w-3 f1-s-7 cl3 hov-cl10 trans-03">
                                                     {["Lorem ipsum dolor sit amet, consectetur adipiscing elit", "Proin velit consectetur non neque", "Nunc vestibulum, enim vitae condimentum volutpat lobortis ante", "Proin velit justo consectetur non neque elementum", "Proin velit consectetur non neque"][i]}
                                                 </a>
                                             </li>
@@ -101,7 +101,7 @@ const BlogList = () => {
                                         {["Fashion", "Lifestyle", "Denim", "Streetstyle", "Crafts", "Magazine", "News", "Blogs"].map((tag, i) => (
                                             <a
                                                 key={i}
-                                                href="#"
+                                                href="/"
                                                 onClick={(e) => e.preventDefault()}
                                                 className="flex-c-c size-h-2 bo-1-rad-20 bocl12 f1-s-1 cl8 hov-btn2 trans-03 p-rl-20 p-tb-5 m-all-5"
                                             >

@@ -44,7 +44,7 @@ const Home = () => {
 
                                 <div className="flex-col-e-s s-full p-rl-25 p-tb-20">
                                     <Link
-                                        to="#"
+                                        to="/"
                                         className="dis-block how1-child2 f1-s-2 cl0 bo-all-1 bocl0 hov-btn1 trans-03 p-rl-5 p-t-2"
                                     >
                                         Business
@@ -82,7 +82,7 @@ const Home = () => {
 
                                         <div className="flex-col-e-s s-full p-rl-25 p-tb-24">
                                             <Link
-                                                to="#"
+                                                to="/"
                                                 className="dis-block how1-child2 f1-s-2 cl0 bo-all-1 bocl0 hov-btn1 trans-03 p-rl-5 p-t-2"
                                             >
                                                 Culture
@@ -111,7 +111,7 @@ const Home = () => {
 
                                         <div className="flex-col-e-s s-full p-rl-25 p-tb-20">
                                             <Link
-                                                to="#"
+                                                to="/"
                                                 className="dis-block how1-child2 f1-s-2 cl0 bo-all-1 bocl0 hov-btn1 trans-03 p-rl-5 p-t-2"
                                             >
                                                 Life Style
@@ -140,7 +140,7 @@ const Home = () => {
 
                                         <div className="flex-col-e-s s-full p-rl-25 p-tb-20">
                                             <Link
-                                                to="#"
+                                                to="/"
                                                 className="dis-block how1-child2 f1-s-2 cl0 bo-all-1 bocl0 hov-btn1 trans-03 p-rl-5 p-t-2"
                                             >
                                                 Sport
@@ -175,22 +175,22 @@ const Home = () => {
                                         <h3 className="f1-m-2 cl12 tab01-title">Entertainment</h3>
                                         <ul className="nav nav-tabs" role="tablist">
                                             <li className="nav-item">
-                                                <a className="nav-link active" data-toggle="tab" href="#tab1-1" role="tab">All</a>
+                                                <a className="nav-link active" data-toggle="tab" href="/tab1-1" role="tab">All</a>
                                             </li>
                                             <li className="nav-item">
-                                                <a className="nav-link" data-toggle="tab" href="#tab1-2" role="tab">Celebrity</a>
+                                                <a className="nav-link" data-toggle="tab" href="/tab1-2" role="tab">Celebrity</a>
                                             </li>
                                             <li className="nav-item">
-                                                <a className="nav-link" data-toggle="tab" href="#tab1-3" role="tab">Movies</a>
+                                                <a className="nav-link" data-toggle="tab" href="/tab1-3" role="tab">Movies</a>
                                             </li>
                                             <li className="nav-item">
-                                                <a className="nav-link" data-toggle="tab" href="#tab1-4" role="tab">Music</a>
+                                                <a className="nav-link" data-toggle="tab" href="/tab1-4" role="tab">Music</a>
                                             </li>
                                             <li className="nav-item">
-                                                <a className="nav-link" data-toggle="tab" href="#tab1-5" role="tab">Games</a>
+                                                <a className="nav-link" data-toggle="tab" href="/tab1-5" role="tab">Games</a>
                                             </li>
                                             <li className="nav-item-more dropdown dis-none">
-                                                <a className="nav-link dropdown-toggle" data-toggle="dropdown" href="#" onClick={preventDefault} role="button">
+                                                <a className="nav-link dropdown-toggle" data-toggle="dropdown" href="/" onClick={preventDefault} role="button">
                                                     <i className="fa fa-ellipsis-h"></i>
                                                 </a>
                                                 <ul className="dropdown-menu"></ul>
@@ -216,7 +216,7 @@ const Home = () => {
                                                                 </Link>
                                                             </h5>
                                                             <span className="cl8">
-                                                                <a href="#" onClick={preventDefault} role="button" className="f1-s-4 cl8 hov-cl10 trans-03">Music</a>
+                                                                <a href="/" onClick={preventDefault} role="button" className="f1-s-4 cl8 hov-cl10 trans-03">Music</a>
                                                                 <span className="f1-s-3 m-rl-3">-</span>
                                                                 <span className="f1-s-3">Feb 18</span>
                                                             </span>
@@ -236,7 +236,7 @@ const Home = () => {
                                                                     </Link>
                                                                 </h5>
                                                                 <span className="cl8">
-                                                                    <a href="#" onClick={preventDefault} role="button" className="f1-s-6 cl8 hov-cl10 trans-03">
+                                                                    <a href="/" onClick={preventDefault} role="button" className="f1-s-6 cl8 hov-cl10 trans-03">
                                                                         {img === 6 ? 'Music' : img === 7 ? 'Game' : 'Celebrity'}
                                                                     </a>
                                                                     <span className="f1-s-3 m-rl-3">-</span>
@@ -263,7 +263,7 @@ const Home = () => {
                                         {[1, 2, 3, 4, 5].map((num, i) => (
                                             <li className="flex-wr-sb-s p-b-22" key={i}>
                                                 <div className="size-a-8 flex-c-c borad-3 size-a-8 bg9 f1-m-4 cl0 m-b-6">{num}</div>
-                                                <a href="#" onClick={preventDefault} role="button" className="size-w-3 f1-s-7 cl3 hov-cl10 trans-03">
+                                                <a href="/" onClick={preventDefault} role="button" className="size-w-3 f1-s-7 cl3 hov-cl10 trans-03">
                                                     {[
                                                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
                                                         "Proin velit consectetur non neque",
@@ -288,12 +288,12 @@ const Home = () => {
                                             { platform: "youtube", label: "5039 Subscribers", action: "Subscribe" },
                                         ].map((item, i) => (
                                             <li className="flex-wr-sb-c p-b-20" key={i}>
-                                                <a href="#" onClick={preventDefault} role="button" className={`size-a-8 flex-c-c borad-3 size-a-8 bg-${item.platform} fs-16 cl0 hov-cl0`}>
+                                                <a href="/" onClick={preventDefault} role="button" className={`size-a-8 flex-c-c borad-3 size-a-8 bg-${item.platform} fs-16 cl0 hov-cl0`}>
                                                     <span className={`fab fa-${item.platform}`}></span>
                                                 </a>
                                                 <div className="size-w-3 flex-wr-sb-c">
                                                     <span className="f1-s-8 cl3 p-r-20">{item.label}</span>
-                                                    <a href="#" onClick={preventDefault} role="button" className="f1-s-9 text-uppercase cl3 hov-cl10 trans-03">
+                                                    <a href="/" onClick={preventDefault} role="button" className="f1-s-9 text-uppercase cl3 hov-cl10 trans-03">
                                                         {item.action}
                                                     </a>
                                                 </div>

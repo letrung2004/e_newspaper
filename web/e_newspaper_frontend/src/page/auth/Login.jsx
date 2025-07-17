@@ -1,64 +1,49 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import cookie from "react-cookies"
+import APIs, { endpoints } from '../../configs/APIs';
+
 
 const Login = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        remember: false
-    });
-
+    const [user, setUser] = useState({});
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const nav = useNavigate();
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.email) {
-            newErrors.email = 'Email là bắt buộc';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email không hợp lệ';
+    const info = [
+        {
+            label: "Tên đăng nhập",
+            type: "text",
+            field: "username"
+        }, {
+            label: "Mật khẩu",
+            type: "password",
+            field: "password"
         }
 
-        if (!formData.password) {
-            newErrors.password = 'Mật khẩu là bắt buộc';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
-        }
+    ];
 
-        return newErrors;
-    };
+    const setState = (value, field) => {
+        setUser({ ...user, [field]: value });
+    }
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const validationErrors = validateForm();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-
         setLoading(true);
+        setErrors({});
 
         try {
-            console.log('Login data:', formData);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            alert('Đăng nhập thành công!');
+            let res = await APIs.post(endpoints['login'], {
+                ...user
+            })
+            const { token } = res.data;
+            console.log("TOKEN: ", res.data)
+            cookie.save("jwtToken", res.data.token)
+
+            nav("/");
+
         } catch (error) {
             console.error('Login error:', error);
             setErrors({ general: 'Đăng nhập thất bại. Vui lòng thử lại.' });
@@ -93,53 +78,22 @@ const Login = () => {
                         )}
 
                         <form onSubmit={handleSubmit} className="magnews-auth-form">
-                            <div className="input-group">
-                                <label htmlFor="email">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    placeholder="Nhập email của bạn"
-                                    className={errors.email ? 'error' : ''}
-                                />
-                                {errors.email && (
-                                    <span className="error-text">{errors.email}</span>
-                                )}
-                            </div>
-
-                            <div className="input-group">
-                                <label htmlFor="password">Mật khẩu</label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    placeholder="Nhập mật khẩu"
-                                    className={errors.password ? 'error' : ''}
-                                />
-                                {errors.password && (
-                                    <span className="error-text">{errors.password}</span>
-                                )}
-                            </div>
-
-                            <div className="form-options">
-                                <label className="remember-me">
+                            {info.map(f =>
+                                <div className="input-group" key={f.field}>
+                                    <label >{f.label}</label>
                                     <input
-                                        type="checkbox"
-                                        name="remember"
-                                        checked={formData.remember}
-                                        onChange={handleChange}
+                                        type={f.type}
+                                        name={f.label}
+                                        value={user[f.field]}
+                                        onChange={e => setState(e.target.value, f.field)}
+                                        placeholder={f.label}
                                     />
-                                    <span className="checkmark"></span>
-                                    Ghi nhớ đăng nhập
-                                </label>
-                                <Link to="/forgot-password" className="forgot-password">
-                                    Quên mật khẩu?
-                                </Link>
-                            </div>
+                                    {errors[f.field] && (
+                                        <span className="error-text">{errors[f.field]}</span>
+                                    )}
+                                </div>
+                            )}
+
 
                             <button
                                 type="submit"

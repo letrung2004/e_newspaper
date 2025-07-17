@@ -49,6 +49,7 @@ public class UserService {
 
         var role = roleRepository.findAllById(request.getRoles());
         user.setRoles(new HashSet<>(role));
+
         return userMapper.toUserResponse(user);
     }
 

@@ -39,18 +39,18 @@ const BlogDetail = () => {
                         <div className="col-md-10 col-lg-8 p-b-30">
                             <div className="p-r-10 p-r-0-sr991">
                                 <div className="p-b-70">
-                                    <Link to="#" onClick={preventDefault} className="f1-s-10 cl2 hov-cl10 trans-03 text-uppercase">Technology</Link>
+                                    <Link to="/" onClick={preventDefault} className="f1-s-10 cl2 hov-cl10 trans-03 text-uppercase">Technology</Link>
                                     <h3 className="f1-l-3 cl2 p-b-16 p-t-33 respon2">
                                         Nulla non interdum metus non laoreet nisi tellus eget aliquam lorem pellentesque
                                     </h3>
                                     <div className="flex-wr-s-s p-b-40">
                                         <span className="f1-s-3 cl8 m-r-15">
-                                            <Link to="#" onClick={preventDefault} className="f1-s-4 cl8 hov-cl10 trans-03">by John Alvarado</Link>
+                                            <Link to="/" onClick={preventDefault} className="f1-s-4 cl8 hov-cl10 trans-03">by John Alvarado</Link>
                                             <span className="m-rl-3">-</span>
                                             <span>Feb 18</span>
                                         </span>
                                         <span className="f1-s-3 cl8 m-r-15">5239 Views</span>
-                                        <Link to="#" onClick={preventDefault} className="f1-s-3 cl8 hov-cl10 trans-03 m-r-15">0 Comment</Link>
+                                        <Link to="/" onClick={preventDefault} className="f1-s-3 cl8 hov-cl10 trans-03 m-r-15">0 Comment</Link>
                                     </div>
 
                                     <audio controls className="w-full my-4">
@@ -76,8 +76,8 @@ const BlogDetail = () => {
                                     <div className="flex-s-s p-t-12 p-b-15">
                                         <span className="f1-s-12 cl5 m-r-8">Tags:</span>
                                         <div className="flex-wr-s-s size-w-0">
-                                            <Link to="#" onClick={preventDefault} className="f1-s-12 cl8 hov-link1 m-r-15">Streetstyle</Link>
-                                            <Link to="#" onClick={preventDefault} className="f1-s-12 cl8 hov-link1 m-r-15">Crafts</Link>
+                                            <Link to="/" onClick={preventDefault} className="f1-s-12 cl8 hov-link1 m-r-15">Streetstyle</Link>
+                                            <Link to="/" onClick={preventDefault} className="f1-s-12 cl8 hov-link1 m-r-15">Crafts</Link>
                                         </div>
                                     </div>
 
@@ -87,7 +87,7 @@ const BlogDetail = () => {
                                             {["facebook", "twitter", "google", "pinterest"].map((net, idx) => (
                                                 <a
                                                     key={idx}
-                                                    href="#"
+                                                    href="/"
                                                     onClick={preventDefault}
                                                     className={`dis-block f1-s-13 cl0 bg-${net} borad-3 p-tb-4 p-rl-18 hov-btn1 m-r-3 m-b-3 trans-03`}
                                                 >
@@ -119,7 +119,7 @@ const BlogDetail = () => {
                                     <ul className="p-t-35">
                                         {[4, 5, 6].map((num, idx) => (
                                             <li className="flex-wr-sb-s p-b-30" key={idx}>
-                                                <Link to="#" onClick={preventDefault} className="size-w-10 wrap-pic-w hov1 trans-03">
+                                                <Link to="/" onClick={preventDefault} className="size-w-10 wrap-pic-w hov1 trans-03">
                                                     <img src={`/assets/images/popular-post-0${num}.jpg`} alt="IMG" />
                                                 </Link>
                                                 <div className="size-w-11">
@@ -129,7 +129,7 @@ const BlogDetail = () => {
                                                         </Link>
                                                     </h6>
                                                     <span className="cl8 txt-center p-b-24">
-                                                        <Link to="#" onClick={preventDefault} className="f1-s-6 cl8 hov-cl10 trans-03">
+                                                        <Link to="/" onClick={preventDefault} className="f1-s-6 cl8 hov-cl10 trans-03">
                                                             {num === 4 ? "Music" : num === 5 ? "Game" : "Celebrity"}
                                                         </Link>
                                                         <span className="f1-s-3 m-rl-3">-</span>
@@ -149,7 +149,7 @@ const BlogDetail = () => {
                                         {["Fashion", "Lifestyle", "Denim", "Streetstyle", "Crafts", "Magazine", "News", "Blogs"].map((tag, idx) => (
                                             <Link
                                                 key={idx}
-                                                to="#"
+                                                to="/"
                                                 onClick={preventDefault}
                                                 className="flex-c-c size-h-2 bo-1-rad-20 bocl12 f1-s-1 cl8 hov-btn2 trans-03 p-rl-20 p-tb-5 m-all-5"
                                             >

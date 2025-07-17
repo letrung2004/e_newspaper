@@ -29,19 +29,19 @@ const ReaderFooter = () => {
                                     </p>
 
                                     <div className="p-t-15">
-                                        <a href="#" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
+                                        <a href="/" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
                                             <span className="fab fa-facebook-f"></span>
                                         </a>
-                                        <a href="#" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
+                                        <a href="/" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
                                             <span className="fab fa-twitter"></span>
                                         </a>
-                                        <a href="#" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
+                                        <a href="/" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
                                             <span className="fab fa-pinterest-p"></span>
                                         </a>
-                                        <a href="#" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
+                                        <a href="/" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
                                             <span className="fab fa-vimeo-v"></span>
                                         </a>
-                                        <a href="#" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
+                                        <a href="/" className="fs-18 cl11 hov-cl10 trans-03 m-r-8">
                                             <span className="fab fa-youtube"></span>
                                         </a>
                                     </div>
@@ -57,7 +57,7 @@ const ReaderFooter = () => {
                                 <ul>
                                     {[1, 2, 3].map((item, idx) => (
                                         <li className="flex-wr-sb-s p-b-20" key={idx}>
-                                            <a href="#" className="size-w-4 wrap-pic-w hov1 trans-03">
+                                            <a href="/" className="size-w-4 wrap-pic-w hov1 trans-03">
                                                 <img
                                                     src={`/assets/images/popular-post-0${item}.jpg`}
                                                     alt="IMG"
@@ -66,7 +66,7 @@ const ReaderFooter = () => {
 
                                             <div className="size-w-5">
                                                 <h6 className="p-b-5">
-                                                    <a href="#" className="f1-s-5 cl11 hov-cl10 trans-03">
+                                                    <a href="/" className="f1-s-5 cl11 hov-cl10 trans-03">
                                                         {idx === 0
                                                             ? "Donec metus orci, malesuada et lectus vitae"
                                                             : idx === 1
@@ -97,7 +97,7 @@ const ReaderFooter = () => {
                                     ].map((cat, i) => (
                                         <li className="how-bor1 p-rl-5 p-tb-10" key={i}>
                                             <a
-                                                href="#"
+                                                href="/"
                                                 className="f1-s-5 cl11 hov-cl10 trans-03 p-tb-8"
                                             >
                                                 {cat}
