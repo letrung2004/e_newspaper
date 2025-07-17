@@ -1,9 +1,7 @@
 package com.newspaper.identityservice.controller;
 
 
-import com.newspaper.identityservice.dto.request.ApiResponse;
-import com.newspaper.identityservice.dto.request.AuthenticationRequest;
-import com.newspaper.identityservice.dto.request.IntrospectRequest;
+import com.newspaper.identityservice.dto.request.*;
 import com.newspaper.identityservice.dto.response.AuthenticationResponse;
 import com.newspaper.identityservice.dto.response.IntrospectResponse;
 import com.newspaper.identityservice.service.AuthenticationService;
@@ -38,5 +36,21 @@ public class AuthenticationController {
         return ApiResponse.<IntrospectResponse>builder()
                 .result(authenticationService.introspect(request))
                 .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+       return ApiResponse.<AuthenticationResponse>builder()
+               .result(authenticationService.refreshToken(request))
+               .build();
     }
 }

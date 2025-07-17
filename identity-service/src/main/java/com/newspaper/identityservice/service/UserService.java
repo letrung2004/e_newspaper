@@ -4,7 +4,6 @@ import com.newspaper.identityservice.dto.request.UserCreationRequest;
 import com.newspaper.identityservice.dto.request.UserUpdateRequest;
 import com.newspaper.identityservice.dto.response.UserResponse;
 import com.newspaper.identityservice.entity.User;
-import com.newspaper.identityservice.enums.Role;
 import com.newspaper.identityservice.exception.AppException;
 import com.newspaper.identityservice.exception.ErrorCode;
 import com.newspaper.identityservice.mapper.UserMapper;
@@ -15,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
