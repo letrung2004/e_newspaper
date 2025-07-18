@@ -10,6 +10,7 @@ import AdminHome from './page/admin/AdminHome';
 import Login from './page/auth/Login';
 import Register from './page/auth/Register';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
+import Authenticate from './page/auth/Authenticate';
 
 
 
@@ -29,12 +30,13 @@ function App() {
             {/* Auth route */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/authenticate" element={<Authenticate />} />
 
             {/* Reader route */}
             <Route path="/" element={< ReaderLayout />}>
               <Route index element={<Home />} />
-              <Route path=":categoryName" element={<BlogList />} />
-              <Route path=":categoryName/:blogName" element={<BlogDetail />} />
+              <Route path="category-article/:categoryName" element={<BlogList />} />
+              <Route path="category-article/:categoryName/:blogName" element={<BlogDetail />} />
             </Route>
 
             {/* Editor route */}

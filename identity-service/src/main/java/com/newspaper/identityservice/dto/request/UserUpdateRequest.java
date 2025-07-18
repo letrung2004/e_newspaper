@@ -1,13 +1,11 @@
 package com.newspaper.identityservice.dto.request;
 
-import com.newspaper.identityservice.entity.Role;
 import com.newspaper.identityservice.validatior.DobConstraint;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder

@@ -3,7 +3,6 @@ package com.newspaper.identityservice.controller;
 import com.newspaper.identityservice.dto.request.ApiResponse;
 import com.newspaper.identityservice.dto.request.RoleRequest;
 import com.newspaper.identityservice.dto.response.RoleResponse;
-import com.newspaper.identityservice.enums.Role;
 import com.newspaper.identityservice.service.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

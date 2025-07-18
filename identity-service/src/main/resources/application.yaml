@@ -17,3 +17,9 @@ jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 3600
   refreshable-duration: 36000
+
+outbound:
+  identity:
+    client-id: "1068236266740-2c0r1gqu2eu1b0lghhn7tg1ea9qpti2a.apps.googleusercontent.com"
+    client-secret: "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"
+    redirect-uri: "http://localhost:3000/authenticate"

@@ -1,6 +1,7 @@
 package com.newspaper.identityservice.controller;
 
 import com.newspaper.identityservice.dto.request.ApiResponse;
+import com.newspaper.identityservice.dto.request.PasswordCreationRequest;
 import com.newspaper.identityservice.dto.request.UserCreationRequest;
 import com.newspaper.identityservice.dto.request.UserUpdateRequest;
 import com.newspaper.identityservice.dto.response.UserResponse;
@@ -65,6 +66,15 @@ public class UserController {
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getMyInfo())
+                .build();
+    }
+
+
+    @PostMapping("/create-password")
+    ApiResponse<Void> createPassword(@RequestBody @Valid PasswordCreationRequest request){
+        userService.createPassword(request);
+        return ApiResponse.<Void>builder()
+                .message("Password has been created, you could use it to log-in")
                 .build();
     }
 }

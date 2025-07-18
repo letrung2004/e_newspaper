@@ -1,17 +1,18 @@
 package com.newspaper.identityservice.service;
 
-import com.newspaper.identityservice.dto.request.AuthenticationRequest;
-import com.newspaper.identityservice.dto.request.IntrospectRequest;
-import com.newspaper.identityservice.dto.request.LogoutRequest;
-import com.newspaper.identityservice.dto.request.RefreshRequest;
+import com.newspaper.identityservice.constant.PredefinedRole;
+import com.newspaper.identityservice.dto.request.*;
 import com.newspaper.identityservice.dto.response.AuthenticationResponse;
 import com.newspaper.identityservice.dto.response.IntrospectResponse;
 import com.newspaper.identityservice.entity.InvalidatedToken;
+import com.newspaper.identityservice.entity.Role;
 import com.newspaper.identityservice.entity.User;
 import com.newspaper.identityservice.exception.AppException;
 import com.newspaper.identityservice.exception.ErrorCode;
 import com.newspaper.identityservice.repository.InvalidatedTokenRepository;
+import com.newspaper.identityservice.repository.httpclient.OutboundIdentityClient;
 import com.newspaper.identityservice.repository.UserRepository;
+import com.newspaper.identityservice.repository.httpclient.OutboundUserClient;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -31,9 +32,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +41,8 @@ import java.util.UUID;
 public class AuthenticationService {
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
+    OutboundIdentityClient outboundIdentityClient;
+    OutboundUserClient outboundUserClient;
 
 
     @NonFinal
@@ -55,6 +56,21 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
+
+    @NonFinal
+    @Value("${outbound.identity.client-id}")
+    protected String CLIENT_ID;
+
+    @NonFinal
+    @Value("${outbound.identity.client-secret}")
+    protected String CLIENT_SECRET;
+
+    @NonFinal
+    @Value("${outbound.identity.redirect-uri}")
+    protected String REDIRECT_URI;
+
+    @NonFinal
+    protected final String GRANT_TYPE = "authorization_code";
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository.findByUsername(request.getUsername())
@@ -200,6 +216,44 @@ public class AuthenticationService {
                 () -> new AppException(ErrorCode.UNAUTHENTICATED)
         );
 
+        var token = generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
+    }
+
+    public AuthenticationResponse outboundAuthenticate(String code) {
+        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType(GRANT_TYPE)
+                .build());
+
+        log.info("TOKEN RESPONSE {}", response);
+
+        // Get user info
+        var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+
+        log.info("User Info {}", userInfo);
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.builder().name(PredefinedRole.USER_ROLE).build());
+
+        // Onboard user
+        var user = userRepository.findByUsername(userInfo.getEmail()).orElseGet(
+                () -> userRepository.save(User.builder()
+                        .username(userInfo.getEmail())
+                        .firstName(userInfo.getGivenName())
+                        .lastName(userInfo.getFamilyName())
+                        .password("11111111")
+                        .roles(roles)
+                        .build()));
+
+        // Generate token
         var token = generateToken(user);
 
         return AuthenticationResponse.builder()

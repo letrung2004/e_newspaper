@@ -1,8 +1,11 @@
 package com.newspaper.identityservice.service;
 
+import com.newspaper.identityservice.constant.PredefinedRole;
+import com.newspaper.identityservice.dto.request.PasswordCreationRequest;
 import com.newspaper.identityservice.dto.request.UserCreationRequest;
 import com.newspaper.identityservice.dto.request.UserUpdateRequest;
 import com.newspaper.identityservice.dto.response.UserResponse;
+import com.newspaper.identityservice.entity.Role;
 import com.newspaper.identityservice.entity.User;
 import com.newspaper.identityservice.exception.AppException;
 import com.newspaper.identityservice.exception.ErrorCode;
@@ -12,10 +15,12 @@ import com.newspaper.identityservice.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,27 +35,30 @@ public class UserService {
     RoleRepository roleRepository;
 
     public UserResponse createUser(UserCreationRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USER_EXISTED);
 
-        if (userRepository.existsByUsername(request.getUsername()))
-            throw new AppException(ErrorCode.USER_EXISTED);
         User user = userMapper.toUser(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        HashSet<Role> roles = new HashSet<>();
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
+
+        user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
-        User user = userRepository.findById(userId).
-                orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        var role = roleRepository.findAllById(request.getRoles());
-        user.setRoles(new HashSet<>(role));
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
 
-        return userMapper.toUserResponse(user);
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
 
@@ -65,6 +73,7 @@ public class UserService {
                 .map(userMapper::toUserResponse).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String id) {
         return userMapper.toUserResponse(userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
@@ -77,7 +86,24 @@ public class UserService {
         User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        return userMapper.toUserResponse(user);
+        var userResponse = userMapper.toUserResponse(user);
+        userResponse.setNoPassword(!StringUtils.hasLength(user.getPassword()));
+
+        return userResponse;
+    }
+
+    public void createPassword(PasswordCreationRequest request){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository.findByUsername(name).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (StringUtils.hasText(user.getPassword()))
+            throw new AppException(ErrorCode.PASSWORD_EXISTED);
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
     }
 
 }

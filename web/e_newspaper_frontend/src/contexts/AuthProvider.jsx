@@ -17,11 +17,24 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-
+        cookie.remove('jwtToken', { path: '/' });
+        delete axios.defaults.headers.common['Authorization'];
+        setUser(null);
     };
 
     const loadUser = async () => {
-
+        try {
+            const token = cookie.load('jwtToken');
+            if (token) {
+                const response = await authAPIs().get(endpoints['my-info']);
+                setUser(response.data);
+            }
+        } catch (error) {
+            console.error('Error loading user:', error);
+            logout(); // Clear invalid token
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
