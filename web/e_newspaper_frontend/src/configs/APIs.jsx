@@ -6,6 +6,7 @@ export const BASE_URL = 'http://localhost:8080'
 export const endpoints = {
     // APIs for auth
     'login': '/identity/auth/token',
+    'my-info': '/identity/users/my-info',
 
 
 

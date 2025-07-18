@@ -2,13 +2,18 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import cookie from "react-cookies"
 import APIs, { endpoints } from '../../configs/APIs';
+import { useAuth } from '../../contexts/AuthProvider';
 
 
 const Login = () => {
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState({
+        username: "",
+        password: ""
+    });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const nav = useNavigate();
+    const { login } = useAuth();
 
     const info = [
         {
@@ -38,9 +43,19 @@ const Login = () => {
             let res = await APIs.post(endpoints['login'], {
                 ...user
             })
-            const { token } = res.data;
-            console.log("TOKEN: ", res.data)
-            cookie.save("jwtToken", res.data.token)
+            const token = res.data.result.token;
+            cookie.save("jwtToken", res.data.result.token)
+
+            console.log("Access token: ", res.data); // chuỗi JWT
+
+
+            const userResponse = await APIs.get(endpoints['my-info'], {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const userData = userResponse.data;
+
+            console.info("User response: ", userData)
+            login(userData, token);
 
             nav("/");
 
@@ -84,6 +99,7 @@ const Login = () => {
                                     <input
                                         type={f.type}
                                         name={f.label}
+                                        autoComplete={f.field === 'password' ? 'current-password' : 'username'}
                                         value={user[f.field]}
                                         onChange={e => setState(e.target.value, f.field)}
                                         placeholder={f.label}

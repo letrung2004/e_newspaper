@@ -10,7 +10,7 @@ const Home = () => {
                 <div className="bg0 flex-sb-c p-rl-20 p-tb-8">
                     {/* Trending Headline */}
                     <div className="f2-s-1 p-r-30 flex-wr-s-c" style={{ minWidth: '0', flex: '1' }}>
-                        <span className="text-uppercase cl2 p-r-8">Trending Now:  Interest rate angst trips up US equity bull market</span>
+                        <span className="cl2 p-r-8">Tin mới:  Bộ Nội vụ đề xuất tăng lương tối thiểu vùng 7,2% từ 1/1/2026</span>
                     </div>
 
                     {/* Search Box */}
@@ -19,7 +19,7 @@ const Home = () => {
                             className="f1-s-1 cl6 plh9 s-full p-l-25 p-r-45"
                             type="text"
                             name="search"
-                            placeholder="Search"
+                            placeholder="Tìm kiếm"
                         />
                         <button className="flex-c-c size-a-1 ab-t-r fs-20 cl2 hov-cl10 trans-03">
                             <i className="zmdi zmdi-search"></i>
