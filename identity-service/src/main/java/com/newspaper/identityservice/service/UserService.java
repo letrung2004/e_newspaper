@@ -1,5 +1,6 @@
 package com.newspaper.identityservice.service;
 
+import com.newspaper.event.dto.NotificationEvent;
 import com.newspaper.identityservice.constant.PredefinedRole;
 import com.newspaper.identityservice.dto.request.PasswordCreationRequest;
 import com.newspaper.identityservice.dto.request.UserCreationRequest;
@@ -15,6 +16,7 @@ import com.newspaper.identityservice.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,7 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     RoleRepository roleRepository;
+    KafkaTemplate<String, Object> kafkaTemplate;
 
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USER_EXISTED);
@@ -44,8 +47,19 @@ public class UserService {
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
         user.setRoles(roles);
+        user = userRepository.save(user);
 
-        return userMapper.toUserResponse(userRepository.save(user));
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .channel("EMAIL")
+                .recipient(request.getEmail())
+                .subject("Welcome to e-newspaper")
+                .body("Hello " + request.getUsername() + "!")
+                .build();
+
+        //gui message cho kafka
+        kafkaTemplate.send("notification-delivery",notificationEvent);
+
+        return userMapper.toUserResponse(user);
     }
 
     @PostAuthorize("returnObject.username == authentication.name")
