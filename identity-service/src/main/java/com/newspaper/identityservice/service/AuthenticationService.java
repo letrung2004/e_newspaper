@@ -43,6 +43,7 @@ public class AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
     OutboundIdentityClient outboundIdentityClient;
     OutboundUserClient outboundUserClient;
+    private final PasswordEncoder passwordEncoder;
 
 
     @NonFinal
@@ -249,7 +250,7 @@ public class AuthenticationService {
                         .username(userInfo.getEmail())
                         .firstName(userInfo.getGivenName())
                         .lastName(userInfo.getFamilyName())
-                        .password("11111111")
+                        .password(passwordEncoder.encode("11111111"))
                         .roles(roles)
                         .build()));
 
