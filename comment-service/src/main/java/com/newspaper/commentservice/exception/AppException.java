@@ -1,4 +1,4 @@
-package com.newspaper.notificationservice.exception;
+package com.newspaper.commentservice.exception;
 
 import lombok.Getter;
 import lombok.Setter;
