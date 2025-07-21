@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import cookie from "react-cookies"
-import APIs, { endpoints } from '../../configs/APIs';
 import { useAuth } from '../../contexts/AuthProvider';
-import { OAuthConfig } from '../../configs/OAuthConfig';
+import { oauth } from '../../configs/oauth';
+import { authService } from '../../services/authService';
+import { tokenStorage } from '../../utils/storage';
+import { buildOAuthUrl } from '../../utils/helpers';
 
 
 const Login = () => {
@@ -41,23 +42,16 @@ const Login = () => {
         setErrors({});
 
         try {
-            let res = await APIs.post(endpoints['login'], {
-                ...user
-            })
-            const token = res.data.result.token;
-            cookie.save("jwtToken", res.data.result.token)
+            const loginResponse = await authService.login(user);
 
-            console.log("Access token: ", res.data); // chuỗi JWT
+            tokenStorage.saveToken(loginResponse.result.token);
 
+            const userResponse = await authService.getUserInfo();
 
-            const userResponse = await APIs.get(endpoints['my-info'], {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const userData = userResponse.data;
+            console.log(loginResponse);
+            console.log(userResponse);
 
-            console.info("User response: ", userData)
-            login(userData, token);
-
+            login(userResponse, loginResponse.result.token);
             nav("/");
 
         } catch (error) {
@@ -69,20 +63,11 @@ const Login = () => {
     };
 
     const handleOutBoundLogin = () => {
-        const callbackUrl = OAuthConfig.redirectUri;
-        const authUrl = OAuthConfig.authUri;
-        const googleClientId = OAuthConfig.clientId;
-
-        const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
-            callbackUrl
-        )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
-
-        console.log(targetUrl);
-
+        const targetUrl = buildOAuthUrl(oauth);
         window.location.href = targetUrl;
     }
 
-    // Xử lý error từ OAuth
+
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');

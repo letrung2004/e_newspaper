@@ -1,89 +1,51 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import cookie from "react-cookies"
-import { BASE_URL, endpoints } from "../../configs/APIs"; // Thêm import endpoints
 import { useAuth } from "../../contexts/AuthProvider";
+import { authService } from "../../services/authService";
+import { tokenStorage } from "../../utils/storage";
+import { extractAuthCode, handleApiError } from "../../utils/helpers";
+
 
 export default function Authenticate() {
     const hasProcessed = useRef(false);
     const navigate = useNavigate();
-    const [isLogin, setIsLogin] = useState(false);
     const { login } = useAuth();
+    const [isLogin, setIsLogin] = useState(false);
 
     useEffect(() => {
         if (hasProcessed.current) return;
-        const authCodeRegex = /code=([^&]+)/;
-        const isMatch = window.location.href.match(authCodeRegex);
+        hasProcessed.current = true;
 
-        if (isMatch) {
-            hasProcessed.current = true;
-            const authCode = isMatch[1];
-            console.log("Auth code received:", authCode);
-
-            // Sử dụng BASE_URL thay vì hardcode localhost
-            fetch(`${BASE_URL}/identity/auth/outbound/authentication?code=${authCode}`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    console.log("Response status:", response.status);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("OAuth response:", data);
-
-                    if (data.result?.token) {
-                        cookie.save("jwtToken", data.result.token, { path: '/' });
-                        fetchUserInfo(data.result.token);
-                    } else {
-                        console.error("No token received from server");
-                        navigate("/login?error=oauth_failed");
-                    }
-                })
-                .catch(error => {
-                    console.error('OAuth authentication error:', error);
-                    navigate("/login?error=oauth_failed");
-                });
-        } else {
-            console.log("No auth code found in URL");
+        const authCode = extractAuthCode(window.location.href);
+        if (!authCode) {
             navigate("/login?error=no_code");
+            return;
         }
-    }, [navigate]);
 
-    const fetchUserInfo = async (token) => {
-        try {
+        const handleOAuthLogin = async () => {
+            try {
+                const res = await authService.loginWithOAuth(authCode);
+                const token = res.result.token;
 
-            const userResponse = await fetch(`${BASE_URL}${endpoints['my-info']}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                if (!token) {
+                    navigate("/login?error=oauth_failed");
+                    return;
                 }
-            });
 
-            console.log("User info response status:", userResponse.status);
+                tokenStorage.saveToken(token);
+                const user = await authService.getUserInfo();
 
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                console.log("User data:", userData);
-
-                // Gọi login từ AuthProvider
-                login(userData, token);
+                login(user, token);
                 setIsLogin(true);
-            } else {
-                console.error("Failed to fetch user info");
-                navigate("/login?error=fetch_user_failed");
+            } catch (err) {
+                console.error("OAuth login error:", err);
+                navigate(`/login?error=${encodeURIComponent(handleApiError(err))}`);
             }
-        } catch (error) {
-            console.error('Error fetching user info:', error);
-            navigate("/login?error=fetch_user_failed");
-        }
-    };
+        };
+
+        handleOAuthLogin();
+    }, [navigate, login]);
 
     useEffect(() => {
         if (isLogin) {
@@ -103,7 +65,7 @@ export default function Authenticate() {
             }}
         >
             <CircularProgress />
-            <Typography>Đang xác thực...</Typography>
+            <Typography>Đang xác thực từ Google...</Typography>
         </Box>
     );
 }

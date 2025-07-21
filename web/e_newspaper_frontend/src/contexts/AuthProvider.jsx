@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-import { authAPIs, endpoints } from '../configs/APIs';
 import cookie from "react-cookies"
+import { tokenStorage } from '../utils/storage';
+import { authService } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -10,15 +10,12 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     const login = (userData, token) => {
-        cookie.save('jwtToken', token, { path: '/' });
-        console.log("Token:", token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        tokenStorage.saveToken(token);
         setUser(userData);
     };
 
     const logout = () => {
-        cookie.remove('jwtToken', { path: '/' });
-        delete axios.defaults.headers.common['Authorization'];
+        authService.logout();
         setUser(null);
     };
 
@@ -26,12 +23,12 @@ const AuthProvider = ({ children }) => {
         try {
             const token = cookie.load('jwtToken');
             if (token) {
-                const response = await authAPIs().get(endpoints['my-info']);
+                const response = await authService.getUserInfo();
                 setUser(response.data);
             }
         } catch (error) {
             console.error('Error loading user:', error);
-            logout(); // Clear invalid token
+            logout();
         } finally {
             setLoading(false);
         }
