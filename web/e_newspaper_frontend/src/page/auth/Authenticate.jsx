@@ -1,20 +1,23 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import cookie from "react-cookies"
 import { BASE_URL, endpoints } from "../../configs/APIs"; // Thêm import endpoints
 import { useAuth } from "../../contexts/AuthProvider";
 
 export default function Authenticate() {
+    const hasProcessed = useRef(false);
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(false);
     const { login } = useAuth();
 
     useEffect(() => {
+        if (hasProcessed.current) return;
         const authCodeRegex = /code=([^&]+)/;
         const isMatch = window.location.href.match(authCodeRegex);
 
         if (isMatch) {
+            hasProcessed.current = true;
             const authCode = isMatch[1];
             console.log("Auth code received:", authCode);
 
@@ -26,6 +29,7 @@ export default function Authenticate() {
                 }
             })
                 .then(response => {
+                    console.log("Response status:", response.status);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -54,6 +58,7 @@ export default function Authenticate() {
 
     const fetchUserInfo = async (token) => {
         try {
+
             const userResponse = await fetch(`${BASE_URL}${endpoints['my-info']}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
