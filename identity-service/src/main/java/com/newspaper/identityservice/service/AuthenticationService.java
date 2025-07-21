@@ -24,6 +24,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -241,18 +242,38 @@ public class AuthenticationService {
 
         log.info("User Info {}", userInfo);
 
-        Set<Role> roles = new HashSet<>();
-        roles.add(Role.builder().name(PredefinedRole.USER_ROLE).build());
+        // Handle user creation with race condition protection
+        User user;
 
-        // Onboard user
-        var user = userRepository.findByUsername(userInfo.getEmail()).orElseGet(
-                () -> userRepository.save(User.builder()
+        // Tìm user trước
+        Optional<User> existingUser = userRepository.findByUsername(userInfo.getEmail());
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+            log.info("Found existing user: {}", userInfo.getEmail());
+        } else {
+            // Nếu không tìm thấy, thử tạo mới
+            try {
+                Set<Role> roles = new HashSet<>();
+                roles.add(Role.builder().name(PredefinedRole.USER_ROLE).build());
+
+                user = userRepository.save(User.builder()
                         .username(userInfo.getEmail())
                         .firstName(userInfo.getGivenName())
                         .lastName(userInfo.getFamilyName())
+                        .email(userInfo.getEmail())
                         .password(passwordEncoder.encode("11111111"))
                         .roles(roles)
-                        .build()));
+                        .build());
+
+                log.info("Created new user: {}", userInfo.getEmail());
+
+            } catch (DataIntegrityViolationException e) {
+                // Nếu bị duplicate key (race condition), tìm lại user
+                log.warn("Race condition detected when creating user: {}. Fetching existing user.", userInfo.getEmail());
+                user = userRepository.findByUsername(userInfo.getEmail())
+                        .orElseThrow(() -> new RuntimeException("User creation failed and existing user not found: " + userInfo.getEmail()));
+            }
+        }
 
         // Generate token
         var token = generateToken(user);
