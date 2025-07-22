@@ -1,96 +1,61 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useRegister from '../../hooks/useRegister';
 
 const Register = () => {
-    const [formData, setFormData] = useState({
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        agreeTerms: false
-    });
-
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
+    const info = [
+        {
+            label: "Họ của bạn",
+            type: "text",
+            field: "lastName"
+        },
+        {
+            label: "Tên của bạn",
+            type: "text",
+            field: "firstName"
+        },
+        {
+            label: "Email",
+            type: "email",
+            field: "email"
+        },
+        {
+            label: "Tên đăng nhập",
+            type: "text",
+            field: "username"
+        }, {
+            label: "Mật khẩu",
+            type: "password",
+            field: "password"
+        },
+        {
+            label: "Xác nhận mật khẩu",
+            type: "password",
+            field: "confirm"
         }
+
+    ];
+    const [user, setUser] = useState({});
+    const { register, errors, loading, setErrors } = useRegister();
+
+    const setState = (value, field) => {
+        setUser({ ...user, [field]: value });
+    }
+
+    const handleChange = (value, field) => {
+        setUser((prev) => ({ ...prev, [field]: value }));
+        setErrors((prev) => ({ ...prev, [field]: "" }));
     };
 
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.fullName) {
-            newErrors.fullName = 'Họ tên là bắt buộc';
-        } else if (formData.fullName.length < 2) {
-            newErrors.fullName = 'Họ tên phải có ít nhất 2 ký tự';
-        }
-
-        if (!formData.email) {
-            newErrors.email = 'Email là bắt buộc';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email không hợp lệ';
-        }
-
-        if (!formData.password) {
-            newErrors.password = 'Mật khẩu là bắt buộc';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
-        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-            newErrors.password = 'Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số';
-        }
-
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Xác nhận mật khẩu là bắt buộc';
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp';
-        }
-
-        if (!formData.agreeTerms) {
-            newErrors.agreeTerms = 'Bạn phải đồng ý với điều khoản sử dụng';
-        }
-
-        return newErrors;
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const validationErrors = validateForm();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            console.log('Register data:', formData);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            alert('Đăng ký thành công!');
-        } catch (error) {
-            console.error('Register error:', error);
-            setErrors({ general: 'Đăng ký thất bại. Vui lòng thử lại.' });
-        } finally {
-            setLoading(false);
-        }
+        await register(user);
     };
+
 
     return (
         <div className="magnews-auth-page">
-
-
             {/* Main Content */}
             <div className="magnews-auth-container">
                 <div className="auth-brand-section">
@@ -114,70 +79,22 @@ const Register = () => {
                         )}
 
                         <form onSubmit={handleSubmit} className="magnews-auth-form">
-                            <div className="input-group">
-                                <label htmlFor="fullName">Họ và tên</label>
-                                <input
-                                    type="text"
-                                    id="fullName"
-                                    name="fullName"
-                                    value={formData.fullName}
-                                    onChange={handleChange}
-                                    placeholder="Nhập họ và tên"
-                                    className={errors.fullName ? 'error' : ''}
-                                />
-                                {errors.fullName && (
-                                    <span className="error-text">{errors.fullName}</span>
-                                )}
-                            </div>
-
-                            <div className="input-group">
-                                <label htmlFor="email">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    placeholder="Nhập email của bạn"
-                                    className={errors.email ? 'error' : ''}
-                                />
-                                {errors.email && (
-                                    <span className="error-text">{errors.email}</span>
-                                )}
-                            </div>
-
-                            <div className="input-group">
-                                <label htmlFor="password">Mật khẩu</label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    placeholder="Nhập mật khẩu"
-                                    className={errors.password ? 'error' : ''}
-                                />
-                                {errors.password && (
-                                    <span className="error-text">{errors.password}</span>
-                                )}
-                            </div>
-
-                            <div className="input-group">
-                                <label htmlFor="confirmPassword">Xác nhận mật khẩu</label>
-                                <input
-                                    type="password"
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    placeholder="Nhập lại mật khẩu"
-                                    className={errors.confirmPassword ? 'error' : ''}
-                                />
-                                {errors.confirmPassword && (
-                                    <span className="error-text">{errors.confirmPassword}</span>
-                                )}
-                            </div>
-
+                            {info.map(f =>
+                                <div className="input-group" key={f.field}>
+                                    <label >{f.label}</label>
+                                    <input
+                                        type={f.type}
+                                        name={f.label}
+                                        autoComplete={f.field === 'password' ? 'current-password' : 'username'}
+                                        value={user[f.field]}
+                                        placeholder={f.label}
+                                        onChange={(e) => handleChange(e.target.value, f.field)}
+                                    />
+                                    {errors[f.field] && (
+                                        <span className="error-text">{errors[f.field]}</span>
+                                    )}
+                                </div>
+                            )}
 
                             <button
                                 type="submit"

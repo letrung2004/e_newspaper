@@ -30,8 +30,11 @@ export const authService = {
     },
 
     //dang ky
-    register: () => {
-        // xu ly dang ky
+    register: async (userRegisterData) => {
+        const res = await AUTH_REQUEST.post(ENDPOINTS.AUTH.REGISTER, userRegisterData);
+        if (res.status !== 200 && res.status !== 201) {
+            throw new Error(res.data.message);
+        }
     },
 
     //refresh token

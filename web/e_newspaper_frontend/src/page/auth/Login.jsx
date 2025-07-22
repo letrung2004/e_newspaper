@@ -5,6 +5,7 @@ import { oauth } from '../../configs/oauth';
 import { authService } from '../../services/authService';
 import { tokenStorage } from '../../utils/storage';
 import { buildOAuthUrl } from '../../utils/helpers';
+import useLogin from '../../hooks/useLogin';
 
 
 const Login = () => {
@@ -12,11 +13,14 @@ const Login = () => {
         username: "",
         password: ""
     });
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const nav = useNavigate();
-    const { login } = useAuth();
-
+    const {
+        errors,
+        loading,
+        loginUser,
+        loginWithGoogle,
+        handleUrlErrors,
+        clearError
+    } = useLogin();
     const info = [
         {
             label: "Tên đăng nhập",
@@ -30,65 +34,27 @@ const Login = () => {
 
     ];
 
-    const setState = (value, field) => {
-        setUser({ ...user, [field]: value });
-    }
+    const handleChange = (value, field) => {
+        setUser(prev => ({ ...prev, [field]: value }));
+        // Clear error khi user bắt đầu nhập
+        clearError(field);
+    };
 
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setErrors({});
-
-        try {
-            const loginResponse = await authService.login(user);
-
-            tokenStorage.saveToken(loginResponse.result.token);
-
-            const userResponse = await authService.getUserInfo();
-
-            console.log(loginResponse);
-            console.log(userResponse);
-
-            login(userResponse, loginResponse.result.token);
-            nav("/");
-
-        } catch (error) {
-            console.error('Login error:', error);
-            setErrors({ general: 'Đăng nhập thất bại. Vui lòng thử lại.' });
-        } finally {
-            setLoading(false);
-        }
+        await loginUser(user);
     };
 
     const handleOutBoundLogin = () => {
-        const targetUrl = buildOAuthUrl(oauth);
-        window.location.href = targetUrl;
+        loginWithGoogle();
     }
 
 
+    // xu ly url errors khi component mount
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const error = urlParams.get('error');
-
-        if (error) {
-            let errorMessage = '';
-            switch (error) {
-                case 'oauth_failed':
-                    errorMessage = 'Đăng nhập Google thất bại. Vui lòng thử lại.';
-                    break;
-                case 'no_code':
-                    errorMessage = 'Không nhận được mã xác thực từ Google.';
-                    break;
-                case 'fetch_user_failed':
-                    errorMessage = 'Không thể lấy thông tin người dùng.';
-                    break;
-                default:
-                    errorMessage = 'Có lỗi xảy ra trong quá trình đăng nhập.';
-            }
-            setErrors({ general: errorMessage });
-        }
+        handleUrlErrors();
     }, []);
 
     return (
@@ -125,7 +91,7 @@ const Login = () => {
                                         name={f.label}
                                         autoComplete={f.field === 'password' ? 'current-password' : 'username'}
                                         value={user[f.field]}
-                                        onChange={e => setState(e.target.value, f.field)}
+                                        onChange={e => handleChange(e.target.value, f.field)}
                                         placeholder={f.label}
                                     />
                                     {errors[f.field] && (
