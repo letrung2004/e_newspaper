@@ -3,11 +3,13 @@ export const ENDPOINTS = {
         LOGIN: '/identity/auth/token',
         ME: '/identity/users/my-info',
         OAUTH: '/identity/auth/outbound/authentication',
+        REGISTER: '/identity/users/registration',
+        REFRESH_TOKEN: '/identity/auth/refresh',
     },
     NEWS: {
-        // Thêm endpoints cho news sau
+        // endpoints cho news
     },
     ADMIN: {
-        // Thêm endpoints cho admin sau
+        // endpoints cho admin
     }
 };

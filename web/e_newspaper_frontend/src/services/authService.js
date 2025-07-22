@@ -4,13 +4,13 @@ import { tokenStorage } from '../utils/storage';
 
 export const authService = {
 
-    // Đăng nhập bằng username/password
+    //dang nhap
     login: async (credentials) => {
         const response = await AUTH_REQUEST.post(ENDPOINTS.AUTH.LOGIN, credentials);
         return response.data;
     },
 
-    // Đăng nhập OAuth
+    // dang nhap OAuth voi google
     loginWithOAuth: async (authCode) => {
         const response = await AUTH_REQUEST.post(
             `${ENDPOINTS.AUTH.OAUTH}?code=${authCode}`
@@ -18,14 +18,27 @@ export const authService = {
         return response.data;
     },
 
-    // Lấy thông tin user
+    //lay thong tin my-info
     getUserInfo: async () => {
         const response = await API.get(ENDPOINTS.AUTH.ME);
         return response.data;
     },
 
-    // Đăng xuất
+    //dang xuat
     logout: () => {
         tokenStorage.removeToken();
+    },
+
+    //dang ky
+    register: () => {
+        // xu ly dang ky
+    },
+
+    //refresh token
+    refreshToken: async (token) => {
+        const response = await AUTH_REQUEST.post(ENDPOINTS.AUTH.REFRESH_TOKEN, {
+            token: token
+        });
+        return response.data;
     }
 };

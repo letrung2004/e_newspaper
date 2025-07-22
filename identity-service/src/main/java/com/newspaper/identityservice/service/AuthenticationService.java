@@ -1,5 +1,6 @@
 package com.newspaper.identityservice.service;
 
+import com.newspaper.event.dto.NotificationEvent;
 import com.newspaper.identityservice.constant.PredefinedRole;
 import com.newspaper.identityservice.dto.request.*;
 import com.newspaper.identityservice.dto.response.AuthenticationResponse;
@@ -25,6 +26,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,7 @@ public class AuthenticationService {
     OutboundIdentityClient outboundIdentityClient;
     OutboundUserClient outboundUserClient;
     private final PasswordEncoder passwordEncoder;
+    KafkaTemplate<String, Object> kafkaTemplate;
 
 
     @NonFinal
@@ -205,6 +208,7 @@ public class AuthenticationService {
         //invalidate token cu
         var jit = signedJWT.getJWTClaimsSet().getJWTID();
         var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
         InvalidatedToken invalidatedToken = InvalidatedToken.builder()
                 .id(jit)
                 .expiryTime(expiryTime)
@@ -212,9 +216,9 @@ public class AuthenticationService {
         invalidatedTokenRepository.save(invalidatedToken);
 
         //tao token moi
-        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var userId = signedJWT.getJWTClaimsSet().getSubject();
 
-        var user = userRepository.findByUsername(username).orElseThrow(
+        var user = userRepository.findById(userId).orElseThrow(
                 () -> new AppException(ErrorCode.UNAUTHENTICATED)
         );
 
@@ -266,6 +270,16 @@ public class AuthenticationService {
                         .build());
 
                 log.info("Created new user: {}", userInfo.getEmail());
+
+                NotificationEvent notificationEvent = NotificationEvent.builder()
+                        .channel("EMAIL")
+                        .recipient(user.getEmail())
+                        .subject("Welcome to e-newspaper")
+                        .body("Hello " + user.getUsername() + "!")
+                        .build();
+
+                //gui message cho kafka
+                kafkaTemplate.send("notification-delivery",notificationEvent);
 
             } catch (DataIntegrityViolationException e) {
                 // Nếu bị duplicate key (race condition), tìm lại user

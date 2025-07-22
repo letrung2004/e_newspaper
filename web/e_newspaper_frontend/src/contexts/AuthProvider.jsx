@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
 
     const loadUser = async () => {
         try {
-            const token = cookie.load('jwtToken');
+            const token = tokenStorage.getToken();
             if (token) {
                 const response = await authService.getUserInfo();
                 setUser(response.data);

@@ -1,18 +1,19 @@
 import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
 import { tokenStorage } from '../utils/storage';
+import { authService } from '../services/authService';
 
-// API instance cho các request cần authentication
+// API các request cần authentication
 export const API = axios.create({
     baseURL: BASE_URL,
 });
 
-// API instance cho auth requests
+// API auth requests
 export const AUTH_REQUEST = axios.create({
     baseURL: BASE_URL,
 });
 
-// Interceptor để tự động thêm token
+// interceptor tự động thêm token
 API.interceptors.request.use((config) => {
     const token = tokenStorage.getToken();
     if (token) {
@@ -21,13 +22,31 @@ API.interceptors.request.use((config) => {
     return config;
 });
 
-// Interceptor để handle response errors
+// kiem tra token khong hop le refresh lai token moi
 API.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            tokenStorage.removeToken();
-            window.location.href = '/login';
+    async (error) => {
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const currentToken = tokenStorage.getToken();
+                const res = await authService.refreshToken(currentToken);
+
+                if (res.code === 1000) {
+                    const newToken = res.result.token;
+                    tokenStorage.saveToken(newToken);
+                    originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                    return API(originalRequest);
+                } else {
+                    throw new Error('Refresh token failed');
+                }
+
+            } catch (refreshError) {
+                tokenStorage.removeToken();
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
+            }
         }
         return Promise.reject(error);
     }
