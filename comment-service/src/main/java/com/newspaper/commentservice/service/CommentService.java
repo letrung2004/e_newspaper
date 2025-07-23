@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +37,12 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
         return commentMapper.toCommentResponse(savedComment);
+    }
+
+    public List<CommentResponse> getAllCommentsInArticle(String articleId) {
+        return commentRepository.findByArticleId(articleId)
+                .stream()
+                .map(commentMapper::toCommentResponse)
+                .toList();
     }
 }

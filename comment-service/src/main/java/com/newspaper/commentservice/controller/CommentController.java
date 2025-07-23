@@ -9,9 +9,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +24,13 @@ public class CommentController {
     ApiResponse<CommentResponse> createComment(@RequestBody CommentRequest request) {
         return ApiResponse.<CommentResponse>builder()
                 .result(commentService.createComment(request))
+                .build();
+    }
+
+    @GetMapping("/{articleId}")
+    ApiResponse<List<CommentResponse>> findCommentsByArticleId(@PathVariable("articleId") String articleId) {
+        return ApiResponse.<List<CommentResponse>>builder()
+                .result(commentService.getAllCommentsInArticle(articleId))
                 .build();
     }
 }
