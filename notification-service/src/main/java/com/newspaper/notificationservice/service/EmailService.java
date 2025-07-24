@@ -10,19 +10,23 @@ import com.newspaper.notificationservice.exception.ErrorCode;
 import com.newspaper.notificationservice.repository.httpclient.EmailClient;
 import feign.FeignException;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmailService {
     EmailClient emailClient;
+    String apiKey;
 
-    String apiKey = "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";
+    public EmailService(EmailClient emailClient,
+                        @Value("${brevo.api-key}") String apiKey) {
+        this.emailClient = emailClient;
+        this.apiKey = apiKey;
+    }
 
     public EmailResponse setEmail(SendEmailRequest request) {
         EmailRequest emailRequest = EmailRequest.builder()

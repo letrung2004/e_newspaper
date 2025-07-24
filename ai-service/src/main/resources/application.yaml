@@ -1,7 +1,7 @@
 server:
-  port: 8080
+  port: 8084
   servlet:
-    context-path: /identity
+    context-path: /ai
 
 spring:
   datasource:
@@ -19,13 +19,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-jwt:
-  signerKey: ${JWT_SIGNER_KEY}
-  valid-duration: 3600
-  refreshable-duration: 3600
 
-outbound:
-  identity:
-    client-id: ${GOOGLE_CLIENT_ID}
-    client-secret: ${GOOGLE_CLIENT_SECRET}
-    redirect-uri: "http://localhost:3000/authenticate"
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}

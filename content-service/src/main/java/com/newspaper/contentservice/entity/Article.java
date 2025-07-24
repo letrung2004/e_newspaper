@@ -33,6 +33,7 @@ public class Article {
     String summary;
 
     String audioUrl;
+    String embedding;
 
     LocalDate publishDate;
 
