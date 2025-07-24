@@ -36,7 +36,7 @@ export default function Authenticate() {
                 tokenStorage.saveToken(token);
                 const user = await authService.getUserInfo();
 
-                login(user, token);
+                login(user.result, token);
                 setIsLogin(true);
             } catch (err) {
                 console.error("OAuth login error:", err);

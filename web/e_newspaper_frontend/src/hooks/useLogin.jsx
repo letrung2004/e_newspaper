@@ -53,7 +53,7 @@ const useLogin = () => {
             const userResponse = await authService.getUserInfo();
 
 
-            login(userResponse, token);
+            login(userResponse.result, token);
 
 
             navigate("/");

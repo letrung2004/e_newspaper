@@ -82,9 +82,9 @@ const ReaderHeader = () => {
                                                 fontSize: '14px',
                                                 fontWeight: 'bold'
                                             }}>
-                                                {(user.result.username || 'U').charAt(0).toUpperCase()}
+                                                {(user.username || 'U').charAt(0).toUpperCase()}
                                             </div>
-                                            <span>{user.result.username || 'User'}</span>
+                                            <span>{user.username || 'User'}</span>
                                             <i className="fas fa-chevron-down" style={{ fontSize: '12px' }}></i>
                                         </button>
 

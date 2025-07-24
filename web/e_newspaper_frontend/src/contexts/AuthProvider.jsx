@@ -23,11 +23,18 @@ const AuthProvider = ({ children }) => {
             const token = tokenStorage.getToken();
             if (token) {
                 const response = await authService.getUserInfo();
-                setUser(response.data);
+                if (response && response.result) {
+                    setUser(response.result);
+                }
             }
         } catch (error) {
             console.error('Error loading user:', error);
-            logout();
+            if (error.response?.status === 401) {
+                logout();
+            } else {
+                console.error('Network or server error:', error);
+                setUser(null);
+            }
         } finally {
             setLoading(false);
         }
