@@ -18,7 +18,19 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
+  ai:
+    openai:
+      api-key: ${GEMINI_KEY}
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completions-path: /v1beta/openai/chat/completions
+        options:
+          model: gemini-2.0-flash
+#  cloud:
+#    gcp:
+#      credentials:
+#        location: classpath:text-to-speech-admin.json
+#      project-id: text-to-speech-admin-466717
 
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
