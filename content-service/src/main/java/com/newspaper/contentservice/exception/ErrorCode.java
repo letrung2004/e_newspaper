@@ -10,7 +10,8 @@ public enum ErrorCode {
     INVALID_KEY(1001, "Uncategorized error", HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
-    CANNOT_SEND_EMAIL(1008, "Cannot send email", HttpStatus.BAD_REQUEST),
+    CANNOT_UPLOAD_IMAGE(1008, "Cannot upload image", HttpStatus.BAD_REQUEST),
+    INVALID_FILE(1009, "Invalid image", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

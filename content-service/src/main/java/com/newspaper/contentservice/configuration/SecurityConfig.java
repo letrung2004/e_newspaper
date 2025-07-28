@@ -18,7 +18,7 @@ public class SecurityConfig {
     private final CustomJwtDecoder customJwtDecoder;
 
     private static final String[] PUBLIC_ENDPOINTS = {
-
+            "image/upload"  //(test o frontend nen mo)
     };
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
