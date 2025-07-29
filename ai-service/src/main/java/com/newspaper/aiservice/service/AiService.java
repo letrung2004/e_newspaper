@@ -2,10 +2,10 @@ package com.newspaper.aiservice.service;
 
 import com.cloudinary.Cloudinary;
 import com.google.cloud.texttospeech.v1.*;
-import com.newspaper.aiservice.dto.request.ArticleProcessRequest;
 import com.newspaper.aiservice.dto.response.SummarizationResponse;
 import com.newspaper.aiservice.dto.response.TextToSpeechResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -29,13 +29,17 @@ public class AiService {
         chatClient = builder.build();
     }
 
-    public SummarizationResponse summarize(ArticleProcessRequest request) {
+    private String removeHtmlTags(String text) {
+        return Jsoup.parse(text).text().replaceAll("\\s+", " ").trim();
+    }
+
+    public SummarizationResponse summarize(String content) {
         SystemMessage systemMessage = new SystemMessage("""
                 Hãy tóm tắt bài báo sau thành 4-5 câu bằng tiếng Việt,
                 tập trung vào những thông tin chính và quan trọng nhất:
                 """);
 
-        UserMessage userMessage = new UserMessage(request.getContent());
+        UserMessage userMessage = new UserMessage(removeHtmlTags(content));
         Prompt prompt = new Prompt(systemMessage, userMessage);
 
 
@@ -43,17 +47,17 @@ public class AiService {
                 .prompt(prompt)
                 .call()
                 .content();
-
+        log.info("Summary from content: {}", result);
         return new SummarizationResponse(result);
     }
 
-    public TextToSpeechResponse convertTextToSpeech(ArticleProcessRequest request) {
+    public TextToSpeechResponse convertTextToSpeech(String content) {
         try {
 
             try (TextToSpeechClient client = TextToSpeechClient.create()) {
 
                 SynthesisInput input = SynthesisInput.newBuilder()
-                        .setText(request.getContent())
+                        .setText(removeHtmlTags(content))
                         .build();
 
                 VoiceSelectionParams voice = VoiceSelectionParams.newBuilder()

@@ -1,4 +1,4 @@
-package com.newspaper.aiservice.dto.request;
+package com.newspaper.contentservice.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

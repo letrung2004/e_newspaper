@@ -17,5 +17,4 @@ public class TagResponse {
     String name;
     String slug;
     String description;
-    Set<ArticleResponse> articles;
 }

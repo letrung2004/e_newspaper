@@ -12,6 +12,7 @@ public enum ErrorCode {
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     CANNOT_UPLOAD_IMAGE(1008, "Cannot upload image", HttpStatus.BAD_REQUEST),
     INVALID_FILE(1009, "Invalid image", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_FOUND(1010, "Category not found", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

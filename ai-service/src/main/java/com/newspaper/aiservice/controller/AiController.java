@@ -1,7 +1,6 @@
 package com.newspaper.aiservice.controller;
 
 import com.newspaper.aiservice.dto.ApiResponse;
-import com.newspaper.aiservice.dto.request.ArticleProcessRequest;
 import com.newspaper.aiservice.dto.response.SummarizationResponse;
 import com.newspaper.aiservice.dto.response.TextToSpeechResponse;
 import com.newspaper.aiservice.service.AiService;
@@ -21,16 +20,16 @@ public class AiController {
     AiService aiService;
 
     @PostMapping("/summary")
-    ApiResponse<SummarizationResponse> summaryArticle(@RequestBody ArticleProcessRequest request) {
+    ApiResponse<SummarizationResponse> summaryArticle(@RequestBody String content) {
         return ApiResponse.<SummarizationResponse>builder()
-                .result(aiService.summarize(request))
+                .result(aiService.summarize(content))
                 .build();
     }
 
     @PostMapping("/tts")
-    ApiResponse<TextToSpeechResponse> textToSpeechArticle(@RequestBody ArticleProcessRequest request) {
+    ApiResponse<TextToSpeechResponse> textToSpeechArticle(@RequestBody String content) {
         return ApiResponse.<TextToSpeechResponse>builder()
-                .result(aiService.convertTextToSpeech(request))
+                .result(aiService.convertTextToSpeech(content))
                 .build();
     }
 

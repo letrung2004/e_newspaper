@@ -4,6 +4,7 @@ import com.newspaper.contentservice.dto.request.CategoryCreateRequest;
 import com.newspaper.contentservice.dto.response.CategoryResponse;
 import com.newspaper.contentservice.entity.Category;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {

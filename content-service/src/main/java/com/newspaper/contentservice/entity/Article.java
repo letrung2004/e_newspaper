@@ -3,6 +3,8 @@ package com.newspaper.contentservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -20,9 +22,11 @@ public class Article {
     String id;
     String title;
     String slug;
+    String featuredImage;
 
     @ElementCollection
     @CollectionTable(name = "article_authors")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Set<String> authors;
 
     @Lob
@@ -34,9 +38,7 @@ public class Article {
 
     String audioUrl;
     String embedding;
-
     LocalDate publishDate;
-
     Integer viewCount = 0;
 
     @ManyToOne
