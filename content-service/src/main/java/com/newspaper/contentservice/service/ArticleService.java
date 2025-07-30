@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,14 +33,14 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ArticleService {
     ArticleRepository articleRepository;
-    TagService tagService;
     CategoryRepository categoryRepository;
     TagRepository tagRepository;
     ArticleMapper articleMapper;
     AiClient aiClient;
+    SlugService slugService;
 
     public ArticleResponse createArticle(ArticleCreateRequest request) {
-        String slug = tagService.generateSlug(request.getTitle());
+        String slug = slugService.generateArticleSlug(request.getTitle());
 
         Category category = categoryRepository.findById(request.getCategory())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
@@ -71,4 +73,31 @@ public class ArticleService {
 
         return articleMapper.toArticleResponse(savedArticle);
     }
+
+    // ai cũng có the lay xem danh sach bao ke da da dang nhap hay chua dang nhap
+    public List<ArticleResponse> getAllArticles() {
+        return articleRepository.findAll().stream()
+                .map(articleMapper::toArticleResponse)
+                .collect(Collectors.toList());
+    }
+
+    public ArticleResponse getArticleById(String id) {
+        return articleMapper.toArticleResponse(
+                articleRepository.findById(id)
+                        .orElseThrow(() -> new AppException(ErrorCode.ARTICLE_NOT_FOUND))
+        );
+    }
+
+    public ArticleResponse getArticleBySlug(String slug) {
+        Article article = articleRepository.findBySlug(slug);
+        if (article == null) {
+            throw new AppException(ErrorCode.ARTICLE_NOT_FOUND);
+        }
+        return articleMapper.toArticleResponse(article);
+    }
+
+    public void deleteArticleById(String id) {
+        articleRepository.deleteById(id);
+    }
+
 }

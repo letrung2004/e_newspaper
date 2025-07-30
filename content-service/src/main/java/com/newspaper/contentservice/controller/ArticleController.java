@@ -8,10 +8,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/article")
@@ -25,6 +24,27 @@ public class ArticleController {
     ApiResponse<ArticleResponse> createArticle(@RequestBody ArticleCreateRequest request) {
         return ApiResponse.<ArticleResponse>builder()
                 .result(articleService.createArticle(request))
+                .build();
+    }
+
+    @GetMapping("/all")
+    ApiResponse<List<ArticleResponse>> getArticles() {
+        return ApiResponse.<List<ArticleResponse>>builder()
+                .result(articleService.getAllArticles())
+                .build();
+    }
+
+    @GetMapping("/detail/{articleId}")
+    ApiResponse<ArticleResponse> getArticle(@PathVariable("articleId") String articleId) {
+        return ApiResponse.<ArticleResponse>builder()
+                .result(articleService.getArticleById(articleId))
+                .build();
+    }
+
+    @GetMapping("/detail/{articleSlug}")
+    ApiResponse<ArticleResponse> getArticleBySlug(@PathVariable("articleSlug") String articleSlug) {
+        return ApiResponse.<ArticleResponse>builder()
+                .result(articleService.getArticleBySlug(articleSlug))
                 .build();
     }
 }

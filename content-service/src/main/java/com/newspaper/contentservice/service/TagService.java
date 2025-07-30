@@ -22,10 +22,11 @@ import java.util.stream.Collectors;
 public class TagService {
     TagRepository tagRepository;
     TagMapper tagMapper;
+    SlugService slugService;
 
     public TagResponse createTag(TagCreateRequest request) {
         Tag tag = tagMapper.toTag(request);
-        tag.setSlug(generateSlug(request.getName()));
+        tag.setSlug(slugService.generateTagSlug(request.getName()));
         Tag saveTag = tagRepository.save(tag);
         return tagMapper.toTagResponse(saveTag);
     }
@@ -36,20 +37,6 @@ public class TagService {
 
     public void deleteTag(String tagId) {
         tagRepository.deleteById(tagId);
-    }
-
-    public String generateSlug(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            return "";
-        }
-
-        String slug = name.toLowerCase();
-        slug = slug.replaceAll("\\s+", "_");
-        slug = Normalizer.normalize(slug, Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}\\p{Punct}&&[^đ]", "")
-                .replaceAll("[^a-z0-9_đ]", "");
-
-        return slug;
     }
 
 }

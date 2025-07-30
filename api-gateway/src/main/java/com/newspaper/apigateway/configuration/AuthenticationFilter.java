@@ -43,7 +43,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/identity/auth/.*",
             "/identity/users/registration",
             "/notification/email/send",
-            "/content/image/upload"  //(test o frontend nen mo)
+            "/content/image/upload",  //(test o frontend nen mo)
+            "/content/article/all",
+            "/content/article/detail/.*",
     };
 
     @Value("${app.api-prefix}")

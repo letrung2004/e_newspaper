@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 public class CategoryService {
     CategoryRepository categoryRepository;
     CategoryMapper categoryMapper;
-    TagService tagService;
+    SlugService slugService;
 
     public CategoryResponse createCategory(CategoryCreateRequest request){
         Category category = categoryMapper.toCategory(request);
-        category.setSlug(tagService.generateSlug(request.getName()));
+        category.setSlug(slugService.generateCategorySlug(request.getName()));
         Category savedCategory = categoryRepository.save(category);
 
         return categoryMapper.toCategoryResponse(savedCategory);
