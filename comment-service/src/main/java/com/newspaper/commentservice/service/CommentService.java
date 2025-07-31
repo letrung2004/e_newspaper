@@ -1,5 +1,6 @@
 package com.newspaper.commentservice.service;
 
+import com.newspaper.commentservice.dto.PageResponse;
 import com.newspaper.commentservice.dto.request.CommentRequest;
 import com.newspaper.commentservice.dto.response.CommentResponse;
 import com.newspaper.commentservice.entity.Comment;
@@ -9,6 +10,9 @@ import com.newspaper.commentservice.repository.CommentRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,7 +35,7 @@ public class CommentService {
                 .content(commentRequest.getContent())
                 .userId(authentication.getName())
                 .createdDate(Instant.now())
-                .articleId(authentication.getName()) // tam thoi do chua tạo content-service
+                .articleId(commentRequest.getArticleId()) // tam thoi do chua tạo content-service
                 .status(CommentStatus.PENDING)
                 .build();
 
@@ -39,10 +43,25 @@ public class CommentService {
         return commentMapper.toCommentResponse(savedComment);
     }
 
-    public List<CommentResponse> getAllCommentsInArticle(String articleId) {
-        return commentRepository.findByArticleId(articleId)
-                .stream()
-                .map(commentMapper::toCommentResponse)
-                .toList();
+    public PageResponse<CommentResponse> getAllCommentsInArticle(String articleId, int page, int size) {
+        //yeu cau phan trang xuong repo
+        Sort sort = Sort.by("createdDate").descending();
+        Pageable pageable = PageRequest.of(page-1, size,sort);
+
+        var pageData = commentRepository.findByArticleId(articleId, pageable);
+
+        return PageResponse.<CommentResponse>builder()
+                .currentPage(page)
+                .pageSize(size)
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream()
+                        .map(commentMapper::toCommentResponse)
+                        .toList())
+                .build();
+//        return commentRepository.findByArticleId(articleId)
+//                .stream()
+//                .map(commentMapper::toCommentResponse)
+//                .toList();
     }
 }

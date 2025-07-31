@@ -1,6 +1,7 @@
 package com.newspaper.contentservice.service;
 
 import com.newspaper.contentservice.dto.ApiResponse;
+import com.newspaper.contentservice.dto.PageResponse;
 import com.newspaper.contentservice.dto.request.ArticleCreateRequest;
 import com.newspaper.contentservice.dto.response.ArticleResponse;
 import com.newspaper.contentservice.dto.response.SummarizationResponse;
@@ -19,6 +20,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -75,10 +79,24 @@ public class ArticleService {
     }
 
     // ai cũng có the lay xem danh sach bao ke da da dang nhap hay chua dang nhap
-    public List<ArticleResponse> getAllArticles() {
-        return articleRepository.findAll().stream()
-                .map(articleMapper::toArticleResponse)
-                .collect(Collectors.toList());
+    public PageResponse<ArticleResponse> getAllArticles(int page, int size) {
+        Sort sort = Sort.by("publishDate").descending();
+        Pageable pageable = PageRequest.of(page-1, size,sort);
+
+        var pageData = articleRepository.findAllBy(pageable);
+
+        return PageResponse.<ArticleResponse>builder()
+                .currentPage(page)
+                .pageSize(size)
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream()
+                        .map(articleMapper::toArticleResponse)
+                        .toList())
+                .build();
+//        return articleRepository.findAll().stream()
+//                .map(articleMapper::toArticleResponse)
+//                .collect(Collectors.toList());
     }
 
     public ArticleResponse getArticleById(String id) {

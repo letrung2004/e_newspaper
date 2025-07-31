@@ -1,6 +1,7 @@
 package com.newspaper.commentservice.controller;
 
 import com.newspaper.commentservice.dto.ApiResponse;
+import com.newspaper.commentservice.dto.PageResponse;
 import com.newspaper.commentservice.dto.request.CommentRequest;
 import com.newspaper.commentservice.dto.response.CommentResponse;
 import com.newspaper.commentservice.entity.Comment;
@@ -28,9 +29,12 @@ public class CommentController {
     }
 
     @GetMapping("/{articleId}")
-    ApiResponse<List<CommentResponse>> findCommentsByArticleId(@PathVariable("articleId") String articleId) {
-        return ApiResponse.<List<CommentResponse>>builder()
-                .result(commentService.getAllCommentsInArticle(articleId))
+    ApiResponse<PageResponse<CommentResponse>> getCommentsByArticleId(
+            @PathVariable("articleId") String articleId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size" , required = false, defaultValue = "5") int size) {
+        return ApiResponse.<PageResponse<CommentResponse>>builder()
+                .result(commentService.getAllCommentsInArticle(articleId, page, size))
                 .build();
     }
 }
