@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class CommentService {
     CommentRepository commentRepository;
     CommentMapper commentMapper;
+    DateTimeFormatter dateTimeFormatter;
 
     public CommentResponse createComment(CommentRequest commentRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -50,14 +51,20 @@ public class CommentService {
 
         var pageData = commentRepository.findByArticleId(articleId, pageable);
 
+        var commentList = pageData.getContent().stream().map(
+                comment -> {
+                    var commentResponse = commentMapper.toCommentResponse(comment);
+                    commentResponse.setCreated(dateTimeFormatter.format(comment.getCreatedDate()));
+                    return commentResponse;
+                }
+        ).toList();
+
         return PageResponse.<CommentResponse>builder()
                 .currentPage(page)
                 .pageSize(size)
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
-                .data(pageData.getContent().stream()
-                        .map(commentMapper::toCommentResponse)
-                        .toList())
+                .data(commentList)
                 .build();
 //        return commentRepository.findByArticleId(articleId)
 //                .stream()

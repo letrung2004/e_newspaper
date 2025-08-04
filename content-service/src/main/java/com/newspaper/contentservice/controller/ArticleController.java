@@ -11,7 +11,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/article")
@@ -56,5 +55,16 @@ public class ArticleController {
     ApiResponse<Void> delete(@PathVariable(value = "articleId") String articleId){
         articleService.deleteArticleById(articleId);
         return ApiResponse.<Void>builder().build();
+    }
+
+    @GetMapping("/all/{categorySlug}")
+    ApiResponse<PageResponse<ArticleResponse>> getArticlesByCategorySlug(
+            @PathVariable("categorySlug") String categorySlug,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size" , required = false, defaultValue = "10") int size
+    ) {
+        return ApiResponse.<PageResponse<ArticleResponse>>builder()
+                .result(articleService.getAllArticlesByCategorySlug(categorySlug,page,size))
+                .build();
     }
 }

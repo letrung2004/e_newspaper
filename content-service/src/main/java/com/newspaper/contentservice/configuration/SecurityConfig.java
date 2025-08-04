@@ -19,9 +19,11 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "image/upload",
-            "article/all",
+            "article/all/**",
             "article/detail-by-slug/**",
             "article/detail-by-id/**",
+            "category",
+            "tag",
     };
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {

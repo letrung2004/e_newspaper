@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
@@ -24,6 +25,7 @@ public class TagService {
     TagMapper tagMapper;
     SlugService slugService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     public TagResponse createTag(TagCreateRequest request) {
         Tag tag = tagMapper.toTag(request);
         tag.setSlug(slugService.generateTagSlug(request.getName()));
@@ -35,6 +37,7 @@ public class TagService {
         return tagRepository.findAll().stream().map(tagMapper::toTagResponse).collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteTag(String tagId) {
         tagRepository.deleteById(tagId);
     }

@@ -1,11 +1,8 @@
 package com.newspaper.contentservice.service;
 
-import com.newspaper.contentservice.dto.ApiResponse;
 import com.newspaper.contentservice.dto.PageResponse;
 import com.newspaper.contentservice.dto.request.ArticleCreateRequest;
 import com.newspaper.contentservice.dto.response.ArticleResponse;
-import com.newspaper.contentservice.dto.response.SummarizationResponse;
-import com.newspaper.contentservice.dto.response.TextToSpeechResponse;
 import com.newspaper.contentservice.entity.Article;
 import com.newspaper.contentservice.entity.Category;
 import com.newspaper.contentservice.entity.Tag;
@@ -23,11 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,7 +38,9 @@ public class ArticleService {
     ArticleMapper articleMapper;
     AiClient aiClient;
     SlugService slugService;
+    DateTimeFormatter formatter;
 
+    @PreAuthorize("hasRole('ADMIN')")
     public ArticleResponse createArticle(ArticleCreateRequest request) {
         String slug = slugService.generateArticleSlug(request.getTitle());
 
@@ -67,7 +65,7 @@ public class ArticleService {
                 .category(category)
                 .tags(tags)
                 .authors(request.getAuthors())
-                .publishDate(LocalDate.now())
+                .publishDate(Instant.now())
                 .audioUrl(audioUrl)
                 .embedding(null)
                 .summary(summary)
@@ -84,15 +82,19 @@ public class ArticleService {
         Pageable pageable = PageRequest.of(page-1, size,sort);
 
         var pageData = articleRepository.findAllBy(pageable);
+        var articleList = pageData.getContent().stream()
+                .map(article -> {
+                        var articleResponse = articleMapper.toArticleResponse(article);
+                        articleResponse.setCreated(formatter.format(article.getPublishDate()));
+                        return articleResponse;
+                }).toList();
 
         return PageResponse.<ArticleResponse>builder()
                 .currentPage(page)
                 .pageSize(size)
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
-                .data(pageData.getContent().stream()
-                        .map(articleMapper::toArticleResponse)
-                        .toList())
+                .data(articleList)
                 .build();
 //        return articleRepository.findAll().stream()
 //                .map(articleMapper::toArticleResponse)
@@ -114,8 +116,34 @@ public class ArticleService {
         return articleMapper.toArticleResponse(article);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteArticleById(String id) {
         articleRepository.deleteById(id);
     }
+
+
+    //get all article by category
+    public PageResponse<ArticleResponse> getAllArticlesByCategorySlug(String categorySlug, int page, int size) {
+        Sort sort = Sort.by("publishDate").descending();
+        Pageable pageable = PageRequest.of(page-1, size,sort);
+        var pageData = articleRepository.findAllByCategory_Slug(categorySlug, pageable);
+
+        var articleList = pageData.getContent().stream()
+                .map(article -> {
+                    var articleResponse = articleMapper.toArticleResponse(article);
+                    articleResponse.setCreated(formatter.format(article.getPublishDate()));
+                    return articleResponse;
+                }).toList();
+
+        return PageResponse.<ArticleResponse>builder()
+                .currentPage(page)
+                .pageSize(size)
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(articleList)
+                .build();
+    }
+
+    //get all article by tag
 
 }

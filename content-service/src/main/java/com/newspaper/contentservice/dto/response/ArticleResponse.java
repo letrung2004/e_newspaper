@@ -3,7 +3,9 @@ package com.newspaper.contentservice.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -20,7 +22,8 @@ public class ArticleResponse {
     String summary;
     String audioUrl;
     String embedding;
-    LocalDate publishDate;
+    Instant publishDate;
+    String created;
     Integer viewCount;
     Set<TagResponse> tags;
     CategoryResponse category;

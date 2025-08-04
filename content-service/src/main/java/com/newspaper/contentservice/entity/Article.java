@@ -6,7 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -38,7 +40,7 @@ public class Article {
 
     String audioUrl;
     String embedding;
-    LocalDate publishDate;
+    Instant publishDate;
     Integer viewCount = 0;
 
     @ManyToOne

@@ -28,7 +28,7 @@ public class CommentController {
                 .build();
     }
 
-    @GetMapping("/{articleId}")
+    @GetMapping("/article/{articleId}")
     ApiResponse<PageResponse<CommentResponse>> getCommentsByArticleId(
             @PathVariable("articleId") String articleId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

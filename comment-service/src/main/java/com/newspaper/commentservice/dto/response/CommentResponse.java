@@ -19,7 +19,7 @@ public class CommentResponse {
     String id;
     String userId;
     String articleId;
-
+    String created;
     String content;
     Instant createdDate;
     CommentStatus status;
