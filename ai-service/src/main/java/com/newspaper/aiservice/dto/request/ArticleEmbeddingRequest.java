@@ -1,4 +1,4 @@
-package com.newspaper.aiservice.dto.response;
+package com.newspaper.aiservice.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EmbeddingResponse {
-    String message;
+public class ArticleEmbeddingRequest {
+    String articleId;
+    String content;
 }

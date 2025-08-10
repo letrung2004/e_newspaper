@@ -34,7 +34,7 @@ public class TagController {
                 .build();
     }
 
-    @DeleteMapping("/{tagId}")
+    @DeleteMapping("/delete/{tagId}")
     ApiResponse<Void> delete(@PathVariable(value = "tagId") String tagId){
         tagService.deleteTag(tagId);
         return ApiResponse.<Void>builder().build();

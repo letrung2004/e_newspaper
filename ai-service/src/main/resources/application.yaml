@@ -7,17 +7,6 @@ spring:
   data:
     mongodb:
       uri: mongodb://root:root@localhost:27017/ai-service?authSource=admin
-  #  kafka:
-  #    bootstrap-servers: localhost:9094
-  #    consumer:
-  #      group-id: ai-group
-  #      auto-offset-reset: earliest
-  #      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-  #      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-  #      properties:
-  #        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-  #        spring.json.trusted.packages: "*"
-  #        spring.json.value.default.type: com.newspaper.event.dto.AiEvent
   ai:
     openai:
       api-key: ${GEMINI_KEY}
@@ -26,11 +15,6 @@ spring:
         completions-path: /v1beta/openai/chat/completions
         options:
           model: gemini-2.0-flash
-#  cloud:
-#    gcp:
-#      credentials:
-#        location: classpath:text-to-speech-admin.json
-#      project-id: text-to-speech-admin-466717
 
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}

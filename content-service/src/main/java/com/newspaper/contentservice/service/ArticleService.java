@@ -40,7 +40,7 @@ public class ArticleService {
     SlugService slugService;
     DateTimeFormatter formatter;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public ArticleResponse createArticle(ArticleCreateRequest request) {
         String slug = slugService.generateArticleSlug(request.getTitle());
 
