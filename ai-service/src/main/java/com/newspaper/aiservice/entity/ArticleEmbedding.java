@@ -2,6 +2,7 @@ package com.newspaper.aiservice.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -18,6 +19,7 @@ public class ArticleEmbedding {
     @MongoId
     String id;
 
+    @Indexed
     String articleId;
 
     List<Chunk> chunks;
@@ -29,6 +31,6 @@ public class ArticleEmbedding {
     public static class Chunk {
         int chunkIndex;
         String chunkContent;
-        List<Double> embeddingVector;
+        List<Float> embeddingVector;
     }
 }
