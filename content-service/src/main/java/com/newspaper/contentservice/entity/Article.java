@@ -25,6 +25,7 @@ public class Article {
     String title;
     String slug;
     String featuredImage;
+    String userId;
 
     @ElementCollection
     @CollectionTable(name = "article_authors")

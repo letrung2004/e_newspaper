@@ -17,7 +17,7 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentResponse {
     String id;
-    String userId;
+    String userName;
     String articleId;
     String created;
     String content;

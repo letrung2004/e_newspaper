@@ -31,7 +31,8 @@ public class SecurityConfig {
             "/auth/introspect",
             "/auth/logout",
             "/auth/refresh",
-            "/auth/outbound/authentication"
+            "/auth/outbound/authentication",
+            "/internal/username/**",
     };
 
     @Autowired
@@ -47,7 +48,7 @@ public class SecurityConfig {
         httpSecurity
                 //.cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                request.requestMatchers( PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 ->

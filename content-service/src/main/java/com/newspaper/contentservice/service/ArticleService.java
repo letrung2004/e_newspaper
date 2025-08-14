@@ -21,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -42,6 +44,7 @@ public class ArticleService {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public ArticleResponse createArticle(ArticleCreateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String slug = slugService.generateArticleSlug(request.getTitle());
 
         Category category = categoryRepository.findById(request.getCategory())
@@ -60,6 +63,7 @@ public class ArticleService {
         Article article = Article.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
+                .userId(authentication.getName())
                 .slug(slug)
                 .featuredImage(request.getFeaturedImage())
                 .category(category)

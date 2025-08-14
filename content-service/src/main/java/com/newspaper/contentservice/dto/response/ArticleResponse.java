@@ -16,6 +16,7 @@ import java.util.Set;
 public class ArticleResponse {
     String id;
     String title;
+    String userId;
     String slug;
     String featuredImage;
     String content;

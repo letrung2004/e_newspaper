@@ -18,7 +18,7 @@ import java.time.Instant;
 public class Comment {
     @MongoId
     String id;
-    String userId;
+    String userName;
     String articleId;
 
     String content;

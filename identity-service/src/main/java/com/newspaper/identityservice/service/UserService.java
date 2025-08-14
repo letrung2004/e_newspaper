@@ -120,5 +120,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public String getUsernameByUserId(String userId){
+        return userRepository.getUsernameById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
 }
 

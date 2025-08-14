@@ -7,6 +7,7 @@ import com.newspaper.commentservice.entity.Comment;
 import com.newspaper.commentservice.entity.CommentStatus;
 import com.newspaper.commentservice.mapper.CommentMapper;
 import com.newspaper.commentservice.repository.CommentRepository;
+import com.newspaper.commentservice.repository.httpclient.UserClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,13 +29,16 @@ public class CommentService {
     CommentRepository commentRepository;
     CommentMapper commentMapper;
     DateTimeFormatter dateTimeFormatter;
+    UserClient userClient;
 
     public CommentResponse createComment(CommentRequest commentRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        var username = userClient.userName(authentication.getName()).getResult();
+
         Comment comment = Comment.builder()
                 .content(commentRequest.getContent())
-                .userId(authentication.getName())
+                .userName(username)
                 .createdDate(Instant.now())
                 .articleId(commentRequest.getArticleId()) // tam thoi do chua tạo content-service
                 .status(CommentStatus.PENDING)
