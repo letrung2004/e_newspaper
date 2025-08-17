@@ -52,13 +52,17 @@ public class ArticleService {
 
         Set<Tag> tags = request.getTags().stream()
                 .map(tagId -> tagRepository.findById(tagId)
-                        .orElseThrow(() -> new IllegalArgumentException("Tag ID không hợp lệ: " + tagId)))
+                        .orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND)))
                 .collect(Collectors.toSet());
         // gọi ai-service chuyển audio và tóm tắc(gọi qua open-feign)
-        String summary = aiClient.createSummary(request.getContent()).getResult().getSummary();
-        String audioUrl = aiClient.createTTS(request.getContent()).getResult().getAudioUrl();
-        log.info("Summary from ai-service: {}", summary);
-        log.info("Url audio from ai-service: {}", audioUrl);
+
+//        String summary = aiClient.createSummary(request.getContent()).getResult().getSummary();
+//        String audioUrl = aiClient.createTTS(request.getContent()).getResult().getAudioUrl();
+//        log.info("Summary from ai-service: {}", summary);
+//        log.info("Url audio from ai-service: {}", audioUrl);
+//         tạm tắc để test
+        String summary = "off ai-service";
+        String audioUrl = "off ai-service";
 
         Article article = Article.builder()
                 .title(request.getTitle())
@@ -83,14 +87,14 @@ public class ArticleService {
     // ai cũng có the lay xem danh sach bao ke da da dang nhap hay chua dang nhap
     public PageResponse<ArticleResponse> getAllArticles(int page, int size) {
         Sort sort = Sort.by("publishDate").descending();
-        Pageable pageable = PageRequest.of(page-1, size,sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         var pageData = articleRepository.findAllBy(pageable);
         var articleList = pageData.getContent().stream()
                 .map(article -> {
-                        var articleResponse = articleMapper.toArticleResponse(article);
-                        articleResponse.setCreated(formatter.format(article.getPublishDate()));
-                        return articleResponse;
+                    var articleResponse = articleMapper.toArticleResponse(article);
+                    articleResponse.setCreated(formatter.format(article.getPublishDate()));
+                    return articleResponse;
                 }).toList();
 
         return PageResponse.<ArticleResponse>builder()
@@ -120,16 +124,15 @@ public class ArticleService {
         return articleMapper.toArticleResponse(article);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public void deleteArticleById(String id) {
         articleRepository.deleteById(id);
     }
 
-
     //get all article by category
     public PageResponse<ArticleResponse> getAllArticlesByCategorySlug(String categorySlug, int page, int size) {
         Sort sort = Sort.by("publishDate").descending();
-        Pageable pageable = PageRequest.of(page-1, size,sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         var pageData = articleRepository.findAllByCategory_Slug(categorySlug, pageable);
 
         var articleList = pageData.getContent().stream()
@@ -148,6 +151,62 @@ public class ArticleService {
                 .build();
     }
 
-    //get all article by tag
+    //update article
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
+    public ArticleResponse updateArticle(String articleId, ArticleCreateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new AppException(ErrorCode.ARTICLE_NOT_FOUND));
+
+
+        if (request.getTitle() != null && !request.getTitle().equals(article.getTitle())) {
+            article.setTitle(request.getTitle());
+            article.setSlug(slugService.generateArticleSlug(request.getTitle()));
+        }
+
+        if (request.getContent() != null && !request.getContent().equals(article.getContent())) {
+            try {
+                article.setContent(request.getContent());
+//                String summary = aiClient.createSummary(request.getContent()).getResult().getSummary();
+//                String audioUrl = aiClient.createTTS(request.getContent()).getResult().getAudioUrl();
+                String summary = "off ai-service-check";
+                String audioUrl = "off ai-service-check";
+
+                article.setSummary(summary);
+                article.setAudioUrl(audioUrl);
+            } catch (Exception e) {
+                log.error("Loi ai-service: {}", articleId, e);
+                throw new AppException(ErrorCode.AI_SERVICE_ERROR);
+            }
+
+        }
+
+        if (request.getFeaturedImage() != null && !request.getFeaturedImage().equals(article.getFeaturedImage())) {
+            article.setFeaturedImage(request.getFeaturedImage());
+        }
+
+        if (!request.getCategory().equals(article.getCategory().getId())) {
+            Category category = categoryRepository.findById(request.getCategory())
+                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+            article.setCategory(category);
+        }
+
+        Set<Tag> newTags = request.getTags().stream()
+                .map(tagId -> tagRepository.findById(tagId)
+                        .orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND)))
+                .collect(Collectors.toSet());
+        if (!newTags.equals(article.getTags())) {
+            article.setTags(newTags);
+        }
+
+        if (!request.getAuthors().equals(article.getAuthors())) {
+            article.setAuthors(request.getAuthors());
+        }
+        article.setUserId(authentication.getName());
+        article = articleRepository.save(article);
+
+
+        return articleMapper.toArticleResponse(article);
+    }
 
 }

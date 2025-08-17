@@ -24,7 +24,7 @@ public class CategoryService {
     CategoryMapper categoryMapper;
     SlugService slugService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public CategoryResponse createCategory(CategoryCreateRequest request){
         Category category = categoryMapper.toCategory(request);
         category.setSlug(slugService.generateCategorySlug(request.getName()));
@@ -39,10 +39,13 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
-
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public void deleteCategory(String categoryId){
         categoryRepository.deleteById(categoryId);
+    }
+
+    public CategoryResponse getCategory(String categorySlug){
+        return categoryRepository.findBySlug(categorySlug);
     }
 
 }

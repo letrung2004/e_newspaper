@@ -5,6 +5,7 @@ import com.newspaper.commentservice.dto.PageResponse;
 import com.newspaper.commentservice.dto.request.CommentRequest;
 import com.newspaper.commentservice.dto.response.CommentResponse;
 import com.newspaper.commentservice.entity.Comment;
+import com.newspaper.commentservice.entity.CommentStatus;
 import com.newspaper.commentservice.service.CommentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,4 +38,32 @@ public class CommentController {
                 .result(commentService.getAllCommentsInArticle(articleId, page, size))
                 .build();
     }
+    @GetMapping
+    ApiResponse<PageResponse<CommentResponse>> getAllComments(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size" , required = false, defaultValue = "10") int size) {
+        return ApiResponse.<PageResponse<CommentResponse>>builder()
+                .result(commentService.getAllComments(page, size))
+                .build();
+    }
+
+    @PutMapping("/approve/{commentId}")
+    public ApiResponse<CommentResponse> approveComment(@PathVariable("commentId") String commentId) {
+        return ApiResponse.<CommentResponse>builder()
+                .result(commentService.updateCommentStatus(commentId, CommentStatus.APPROVED))
+                .build();
+    }
+
+    @PutMapping("/reject/{commentId}")
+    ApiResponse<CommentResponse> rejectComment(@PathVariable("commentId") String commentId) {
+        return ApiResponse.<CommentResponse>builder()
+                .result(commentService.updateCommentStatus(commentId, CommentStatus.REJECTED))
+                .build();
+    }
+    @DeleteMapping("/delete/{commentId}")
+    public void deleteComment(@PathVariable("commentId") String commentId) {
+        commentService.deleteComment(commentId);
+    }
+
+
 }

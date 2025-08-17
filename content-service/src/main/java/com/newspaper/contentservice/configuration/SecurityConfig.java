@@ -22,7 +22,7 @@ public class SecurityConfig {
             "article/all/**",
             "article/detail-by-slug/**",
             "article/detail-by-id/**",
-            "category",
+            "category", "category/detail/**",
             "tag",
     };
 

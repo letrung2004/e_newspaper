@@ -25,7 +25,7 @@ public class TagService {
     TagMapper tagMapper;
     SlugService slugService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public TagResponse createTag(TagCreateRequest request) {
         Tag tag = tagMapper.toTag(request);
         tag.setSlug(slugService.generateTagSlug(request.getName()));
@@ -37,7 +37,7 @@ public class TagService {
         return tagRepository.findAll().stream().map(tagMapper::toTagResponse).collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public void deleteTag(String tagId) {
         tagRepository.deleteById(tagId);
     }

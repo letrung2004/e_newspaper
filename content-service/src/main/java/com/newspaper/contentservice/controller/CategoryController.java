@@ -39,4 +39,12 @@ public class CategoryController {
         categoryService.deleteCategory(categoryId);
         return ApiResponse.<Void>builder().build();
     }
+
+    @GetMapping("/detail/{categorySlug}")
+    ApiResponse<CategoryResponse> getDetailCategory(@PathVariable(value = "categorySlug") String categorySlug){
+        categoryService.getCategory(categorySlug);
+        return ApiResponse.<CategoryResponse>builder()
+                .result(categoryService.getCategory(categorySlug))
+                .build();
+    }
 }

@@ -67,4 +67,14 @@ public class ArticleController {
                 .result(articleService.getAllArticlesByCategorySlug(categorySlug,page,size))
                 .build();
     }
+
+    @PutMapping("/update/{articleId}")
+    ApiResponse<ArticleResponse> updateArticle(
+            @PathVariable(value = "articleId") String articleId,
+            @RequestBody ArticleCreateRequest request){
+
+        return ApiResponse.<ArticleResponse>builder()
+                .result(articleService.updateArticle(articleId, request))
+                .build();
+    }
 }
