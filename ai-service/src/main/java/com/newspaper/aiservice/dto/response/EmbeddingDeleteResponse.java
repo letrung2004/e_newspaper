@@ -8,6 +8,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChatResponse {
-    String answer;
+public class EmbeddingDeleteResponse {
+    String message;
 }

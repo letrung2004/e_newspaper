@@ -1,14 +1,14 @@
-package com.newspaper.aiservice.dto.request;
+package com.newspaper.event.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ArticleEmbeddingRequest {
+public class ArticleCreatedEvent {
     String articleId;
     String content;
 }

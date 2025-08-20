@@ -12,7 +12,7 @@ import com.newspaper.contentservice.mapper.ArticleMapper;
 import com.newspaper.contentservice.repository.ArticleRepository;
 import com.newspaper.contentservice.repository.CategoryRepository;
 import com.newspaper.contentservice.repository.TagRepository;
-import com.newspaper.contentservice.repository.httpClient.AiClient;
+import com.newspaper.event.dto.ArticleCreatedEvent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,9 +39,9 @@ public class ArticleService {
     CategoryRepository categoryRepository;
     TagRepository tagRepository;
     ArticleMapper articleMapper;
-    AiClient aiClient;
     SlugService slugService;
     DateTimeFormatter formatter;
+    KafkaTemplate<String, ArticleCreatedEvent> kafkaTemplate;  // chưa xử lý
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public ArticleResponse createArticle(ArticleCreateRequest request) {
@@ -61,8 +62,8 @@ public class ArticleService {
 //        log.info("Summary from ai-service: {}", summary);
 //        log.info("Url audio from ai-service: {}", audioUrl);
 //         tạm tắc để test
-        String summary = "off ai-service";
-        String audioUrl = "off ai-service";
+//        String summary = "off ai-service";
+//        String audioUrl = "off ai-service";
 
         Article article = Article.builder()
                 .title(request.getTitle())
@@ -74,12 +75,20 @@ public class ArticleService {
                 .tags(tags)
                 .authors(request.getAuthors())
                 .publishDate(Instant.now())
-                .audioUrl(audioUrl)
+                .audioUrl(null)
                 .embedding(null)
-                .summary(summary)
+                .summary(null)
                 .build();
 
         Article savedArticle = articleRepository.save(article);
+
+        ArticleCreatedEvent createArticleEvent = ArticleCreatedEvent.builder()
+                .articleId(savedArticle.getId())
+                .content(savedArticle.getContent())
+                .build();
+
+        kafkaTemplate.send("create-article", createArticleEvent);
+        log.info("article {} send message to ai-service", savedArticle.getId());
 
         return articleMapper.toArticleResponse(savedArticle);
     }

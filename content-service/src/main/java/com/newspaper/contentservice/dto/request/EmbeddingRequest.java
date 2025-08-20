@@ -1,4 +1,4 @@
-package com.newspaper.aiservice.dto.response;
+package com.newspaper.contentservice.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChatResponse {
-    String answer;
+public class EmbeddingRequest {
+    String articleId;
+    String content;
 }
