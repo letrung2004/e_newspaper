@@ -135,6 +135,7 @@ public class ArticleService {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public void deleteArticleById(String id) {
+        // cần xử lý gọi đến ai-service xóa luôn embeding và gọi đến comment xóa luôn comment
         articleRepository.deleteById(id);
     }
 
