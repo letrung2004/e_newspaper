@@ -1,5 +1,6 @@
 package com.newspaper.searchservice.mapper;
 
+import com.newspaper.event.dto.ArticleCreatedForSearchEvent;
 import com.newspaper.searchservice.dto.response.ArticleSearchResponse;
 import com.newspaper.searchservice.entity.ArticleDocument;
 import org.mapstruct.Mapper;
@@ -13,4 +14,6 @@ public interface  ArticleMapper {
     ArticleSearchResponse toResponse(ArticleDocument document);
 
     List<ArticleSearchResponse> toResponseList(List<ArticleDocument> documents);
+
+    ArticleDocument toArticleDocument(ArticleCreatedForSearchEvent event);
 }

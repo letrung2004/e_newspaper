@@ -8,11 +8,13 @@ import com.newspaper.contentservice.entity.Category;
 import com.newspaper.contentservice.entity.Tag;
 import com.newspaper.contentservice.exception.AppException;
 import com.newspaper.contentservice.exception.ErrorCode;
+import com.newspaper.contentservice.mapper.ArticleEventMapper;
 import com.newspaper.contentservice.mapper.ArticleMapper;
 import com.newspaper.contentservice.repository.ArticleRepository;
 import com.newspaper.contentservice.repository.CategoryRepository;
 import com.newspaper.contentservice.repository.TagRepository;
 import com.newspaper.event.dto.ArticleCreatedEvent;
+import com.newspaper.event.dto.ArticleCreatedForSearchEvent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,7 +43,8 @@ public class ArticleService {
     ArticleMapper articleMapper;
     SlugService slugService;
     DateTimeFormatter formatter;
-    KafkaTemplate<String, ArticleCreatedEvent> kafkaTemplate;  // chưa xử lý
+    KafkaTemplate<String, ArticleCreatedEvent> kafkaTemplate;
+
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public ArticleResponse createArticle(ArticleCreateRequest request) {
@@ -55,30 +58,14 @@ public class ArticleService {
                 .map(tagId -> tagRepository.findById(tagId)
                         .orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND)))
                 .collect(Collectors.toSet());
-        // gọi ai-service chuyển audio và tóm tắc(gọi qua open-feign)
 
-//        String summary = aiClient.createSummary(request.getContent()).getResult().getSummary();
-//        String audioUrl = aiClient.createTTS(request.getContent()).getResult().getAudioUrl();
-//        log.info("Summary from ai-service: {}", summary);
-//        log.info("Url audio from ai-service: {}", audioUrl);
-//         tạm tắc để test
-//        String summary = "off ai-service";
-//        String audioUrl = "off ai-service";
-
-        Article article = Article.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .userId(authentication.getName())
-                .slug(slug)
-                .featuredImage(request.getFeaturedImage())
-                .category(category)
-                .tags(tags)
-                .authors(request.getAuthors())
-                .publishDate(Instant.now())
-                .audioUrl(null)
-                .embedding(null)
-                .summary(null)
-                .build();
+        // luu xuong db cac truong co ban
+        Article article = articleMapper.toArticle(request);
+        article.setSlug(slug);
+        article.setUserId(authentication.getName());
+        article.setPublishDate(Instant.now());
+        article.setCategory(category);
+        article.setTags(tags);
 
         Article savedArticle = articleRepository.save(article);
 
@@ -86,9 +73,13 @@ public class ArticleService {
                 .articleId(savedArticle.getId())
                 .content(savedArticle.getContent())
                 .build();
-
+        //send event to ai-service
         kafkaTemplate.send("create-article", createArticleEvent);
         log.info("article {} send message to ai-service", savedArticle.getId());
+
+        //send event to search-service
+//        ArticleCreatedForSearchEvent event = articleEventMapper.toSearchEvent(savedArticle);
+//        kafkaTemplateSearchEvent.send("create-search-article", event);
 
         return articleMapper.toArticleResponse(savedArticle);
     }
@@ -113,9 +104,6 @@ public class ArticleService {
                 .totalElements(pageData.getTotalElements())
                 .data(articleList)
                 .build();
-//        return articleRepository.findAll().stream()
-//                .map(articleMapper::toArticleResponse)
-//                .collect(Collectors.toList());
     }
 
     public ArticleResponse getArticleById(String id) {
@@ -130,7 +118,9 @@ public class ArticleService {
         if (article == null) {
             throw new AppException(ErrorCode.ARTICLE_NOT_FOUND);
         }
-        return articleMapper.toArticleResponse(article);
+        var articleResponse = articleMapper.toArticleResponse(article);
+        articleResponse.setCreated(formatter.format(article.getPublishDate()));
+        return articleResponse;
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
@@ -139,7 +129,6 @@ public class ArticleService {
         articleRepository.deleteById(id);
     }
 
-    //get all article by category
     public PageResponse<ArticleResponse> getAllArticlesByCategorySlug(String categorySlug, int page, int size) {
         Sort sort = Sort.by("publishDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
