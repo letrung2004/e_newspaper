@@ -1,5 +1,6 @@
 package com.newspaper.contentservice.dto.response;
 
+import com.newspaper.contentservice.entity.ArticleStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -26,6 +27,7 @@ public class ArticleResponse {
     Instant publishDate;
     String created;
     Integer viewCount;
+    ArticleStatus status;
     Set<TagResponse> tags;
     CategoryResponse category;
     Set<String> authors;

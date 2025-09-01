@@ -42,6 +42,10 @@ public class Article {
     Instant publishDate;
     Integer viewCount = 0;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    ArticleStatus status;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     Category category;

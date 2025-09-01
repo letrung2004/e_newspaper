@@ -60,4 +60,8 @@ public class ArticleSearchService {
 
     // chưa viết controller
     // phải convert publishDate tu Instance sang String luc luu xuong elastic
+
+    public void deleteArticleDocument(String id) {
+        articleSearchRepository.deleteById(id);
+    }
 }

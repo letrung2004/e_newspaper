@@ -40,4 +40,8 @@ public class ArticleSearchController {
                 .result(articleSearchService.searchByKeyword(keyword))
                 .build();
     }
+    @DeleteMapping("/{id}")
+    public void deleteArticle(@PathVariable("id") String id) {
+        articleSearchService.deleteArticleDocument(id);
+    }
 }

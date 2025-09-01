@@ -116,4 +116,12 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
+    public void deleteByArticleId(String articleId) {
+        if (commentRepository.findByArticleId(articleId, PageRequest.of(0, 1)).isEmpty()) {
+            throw new AppException(ErrorCode.COMMENT_NOT_EXIST);
+        }
+        commentRepository.deleteByArticleId(articleId);
+    }
+
 }

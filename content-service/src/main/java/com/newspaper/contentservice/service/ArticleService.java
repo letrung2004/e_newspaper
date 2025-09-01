@@ -4,17 +4,19 @@ import com.newspaper.contentservice.dto.PageResponse;
 import com.newspaper.contentservice.dto.request.ArticleCreateRequest;
 import com.newspaper.contentservice.dto.response.ArticleResponse;
 import com.newspaper.contentservice.entity.Article;
+import com.newspaper.contentservice.entity.ArticleStatus;
 import com.newspaper.contentservice.entity.Category;
 import com.newspaper.contentservice.entity.Tag;
 import com.newspaper.contentservice.exception.AppException;
 import com.newspaper.contentservice.exception.ErrorCode;
-import com.newspaper.contentservice.mapper.ArticleEventMapper;
 import com.newspaper.contentservice.mapper.ArticleMapper;
 import com.newspaper.contentservice.repository.ArticleRepository;
 import com.newspaper.contentservice.repository.CategoryRepository;
 import com.newspaper.contentservice.repository.TagRepository;
-import com.newspaper.event.dto.ArticleCreatedEvent;
-import com.newspaper.event.dto.ArticleCreatedForSearchEvent;
+
+import com.newspaper.contentservice.repository.httpclient.AiClient;
+import com.newspaper.contentservice.repository.httpclient.CommentClient;
+import com.newspaper.contentservice.repository.httpclient.SearchClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,43 +44,40 @@ public class ArticleService {
     ArticleMapper articleMapper;
     SlugService slugService;
     DateTimeFormatter formatter;
-    KafkaTemplate<String, ArticleCreatedEvent> kafkaTemplate;
+    ArticleEventProducer articleEventProducer;
+    CommentClient commentClient;
+    AiClient aiClient;
+    SearchClient searchClient;
+
+
+    private Category resolveCategory(String categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
+
+    private Set<Tag> resolveTags(Set<String> tagIds) {
+        return tagIds.stream()
+                .map(tagId -> tagRepository.findById(tagId)
+                        .orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND)))
+                .collect(Collectors.toSet());
+    }
+
 
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public ArticleResponse createArticle(ArticleCreateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String slug = slugService.generateArticleSlug(request.getTitle());
 
-        Category category = categoryRepository.findById(request.getCategory())
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-
-        Set<Tag> tags = request.getTags().stream()
-                .map(tagId -> tagRepository.findById(tagId)
-                        .orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND)))
-                .collect(Collectors.toSet());
-
-        // luu xuong db cac truong co ban
         Article article = articleMapper.toArticle(request);
-        article.setSlug(slug);
+        article.setSlug(slugService.generateArticleSlug(request.getTitle()));
         article.setUserId(authentication.getName());
         article.setPublishDate(Instant.now());
-        article.setCategory(category);
-        article.setTags(tags);
+        article.setCategory(resolveCategory(request.getCategory()));
+        article.setTags(resolveTags(request.getTags()));
+        article.setStatus(ArticleStatus.PENDING);
 
         Article savedArticle = articleRepository.save(article);
-
-        ArticleCreatedEvent createArticleEvent = ArticleCreatedEvent.builder()
-                .articleId(savedArticle.getId())
-                .content(savedArticle.getContent())
-                .build();
-        //send event to ai-service
-        kafkaTemplate.send("create-article", createArticleEvent);
-        log.info("article {} send message to ai-service", savedArticle.getId());
-
-        //send event to search-service
-//        ArticleCreatedForSearchEvent event = articleEventMapper.toSearchEvent(savedArticle);
-//        kafkaTemplateSearchEvent.send("create-search-article", event);
+        articleEventProducer.sendArticleContentChangedEvent(savedArticle);
 
         return articleMapper.toArticleResponse(savedArticle);
     }
@@ -125,8 +123,10 @@ public class ArticleService {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public void deleteArticleById(String id) {
-        // cần xử lý gọi đến ai-service xóa luôn embeding và gọi đến comment xóa luôn comment
         articleRepository.deleteById(id);
+        commentClient.deleteByArticleId(id);
+        aiClient.deleteArticleEmbedding(id);
+        searchClient.deleteByArticleId(id);
     }
 
     public PageResponse<ArticleResponse> getAllArticlesByCategorySlug(String categorySlug, int page, int size) {
@@ -150,62 +150,56 @@ public class ArticleService {
                 .build();
     }
 
-    //update article
+
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public ArticleResponse updateArticle(String articleId, ArticleCreateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new AppException(ErrorCode.ARTICLE_NOT_FOUND));
 
+        boolean contentChanged = false;
 
         if (request.getTitle() != null && !request.getTitle().equals(article.getTitle())) {
             article.setTitle(request.getTitle());
             article.setSlug(slugService.generateArticleSlug(request.getTitle()));
         }
-
         if (request.getContent() != null && !request.getContent().equals(article.getContent())) {
-            try {
-                article.setContent(request.getContent());
-//                String summary = aiClient.createSummary(request.getContent()).getResult().getSummary();
-//                String audioUrl = aiClient.createTTS(request.getContent()).getResult().getAudioUrl();
-                String summary = "off ai-service-check";
-                String audioUrl = "off ai-service-check";
-
-                article.setSummary(summary);
-                article.setAudioUrl(audioUrl);
-            } catch (Exception e) {
-                log.error("Loi ai-service: {}", articleId, e);
-                throw new AppException(ErrorCode.AI_SERVICE_ERROR);
-            }
-
+            article.setContent(request.getContent());
+            contentChanged = true;
         }
-
         if (request.getFeaturedImage() != null && !request.getFeaturedImage().equals(article.getFeaturedImage())) {
             article.setFeaturedImage(request.getFeaturedImage());
         }
-
         if (!request.getCategory().equals(article.getCategory().getId())) {
-            Category category = categoryRepository.findById(request.getCategory())
-                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-            article.setCategory(category);
+            article.setCategory(resolveCategory(request.getCategory()));
         }
-
-        Set<Tag> newTags = request.getTags().stream()
-                .map(tagId -> tagRepository.findById(tagId)
-                        .orElseThrow(() -> new AppException(ErrorCode.TAG_NOT_FOUND)))
-                .collect(Collectors.toSet());
+        Set<Tag> newTags = resolveTags(request.getTags());
         if (!newTags.equals(article.getTags())) {
             article.setTags(newTags);
         }
-
         if (!request.getAuthors().equals(article.getAuthors())) {
             article.setAuthors(request.getAuthors());
         }
-        article.setUserId(authentication.getName());
-        article = articleRepository.save(article);
 
+        article.setUserId(authentication.getName());
+        Article savedArticle = articleRepository.save(article);
+
+        if (contentChanged) {
+            articleEventProducer.sendArticleContentChangedEvent(savedArticle);
+        }
+
+        return articleMapper.toArticleResponse(savedArticle);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
+    public ArticleResponse updateStatus(String articleId, ArticleStatus newStatus) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new AppException(ErrorCode.ARTICLE_NOT_FOUND));
+        article.setStatus(newStatus);
+        article = articleRepository.save(article);
 
         return articleMapper.toArticleResponse(article);
     }
+
 
 }

@@ -65,5 +65,10 @@ public class CommentController {
         commentService.deleteComment(commentId);
     }
 
+    @DeleteMapping("/article/{articleId}")
+    public void deleteAllArticleComments(@PathVariable("articleId") String articleId) {
+        commentService.deleteByArticleId(articleId);
+    }
+
 
 }

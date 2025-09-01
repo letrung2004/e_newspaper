@@ -35,3 +35,13 @@ cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
   api-key: ${CLOUDINARY_API_KEY}
   api-secret: ${CLOUDINARY_API_SECRET}
+
+
+app:
+  services:
+    comments:
+      url: http://localhost:8082/comment
+    ai:
+      url: http://localhost:8084/ai
+    search:
+      url: http://localhost:8085/search

@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EmbeddingResponse {
-    String articleId;
-    int chunks;
+public class EmbeddingDeleteResponse {
+    String message;
 }

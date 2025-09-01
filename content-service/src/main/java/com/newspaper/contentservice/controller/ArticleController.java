@@ -3,6 +3,7 @@ package com.newspaper.contentservice.controller;
 import com.newspaper.contentservice.dto.ApiResponse;
 import com.newspaper.contentservice.dto.PageResponse;
 import com.newspaper.contentservice.dto.request.ArticleCreateRequest;
+import com.newspaper.contentservice.dto.request.UpdateStatusRequest;
 import com.newspaper.contentservice.dto.response.ArticleResponse;
 import com.newspaper.contentservice.service.ArticleService;
 import lombok.AccessLevel;
@@ -72,9 +73,18 @@ public class ArticleController {
     ApiResponse<ArticleResponse> updateArticle(
             @PathVariable(value = "articleId") String articleId,
             @RequestBody ArticleCreateRequest request){
-
         return ApiResponse.<ArticleResponse>builder()
                 .result(articleService.updateArticle(articleId, request))
+                .build();
+    }
+
+    @PatchMapping("update-status/{articleId}")
+    ApiResponse<ArticleResponse> updateArticleStatus(
+            @PathVariable(value = "articleId") String articleId,
+            @RequestBody UpdateStatusRequest request
+    ){
+        return  ApiResponse.<ArticleResponse>builder()
+                .result(articleService.updateStatus(articleId,request.getStatus()))
                 .build();
     }
 }
