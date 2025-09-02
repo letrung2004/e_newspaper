@@ -87,4 +87,14 @@ public class ArticleController {
                 .result(articleService.updateStatus(articleId,request.getStatus()))
                 .build();
     }
+
+    @GetMapping("/all-status")
+    ApiResponse<PageResponse<ArticleResponse>> getArticlesForAdmin(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size" , required = false, defaultValue = "20") int size
+    ) {
+        return ApiResponse.<PageResponse<ArticleResponse>>builder()
+                .result(articleService.getAllArticlesForAdmin(page,size))
+                .build();
+    }
 }

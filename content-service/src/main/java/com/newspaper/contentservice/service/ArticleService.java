@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,14 @@ public class ArticleService {
                 .collect(Collectors.toSet());
     }
 
+    private List<ArticleResponse> mapToArticleResponseList(List<Article> articles) {
+        return articles.stream()
+                .map(article -> {
+                    var articleResponse = articleMapper.toArticleResponse(article);
+                    articleResponse.setCreated(formatter.format(article.getPublishDate()));
+                    return articleResponse;
+                }).toList();
+    }
 
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
@@ -82,18 +91,12 @@ public class ArticleService {
         return articleMapper.toArticleResponse(savedArticle);
     }
 
-    // ai cũng có the lay xem danh sach bao ke da da dang nhap hay chua dang nhap
     public PageResponse<ArticleResponse> getAllArticles(int page, int size) {
         Sort sort = Sort.by("publishDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        var pageData = articleRepository.findAllBy(pageable);
-        var articleList = pageData.getContent().stream()
-                .map(article -> {
-                    var articleResponse = articleMapper.toArticleResponse(article);
-                    articleResponse.setCreated(formatter.format(article.getPublishDate()));
-                    return articleResponse;
-                }).toList();
+        var pageData = articleRepository.findAllByStatus(ArticleStatus.PUBLISHED, pageable);
+        var articleList = mapToArticleResponseList(pageData.getContent());
 
         return PageResponse.<ArticleResponse>builder()
                 .currentPage(page)
@@ -123,6 +126,9 @@ public class ArticleService {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
     public void deleteArticleById(String id) {
+        if (!articleRepository.existsById(id)) {
+            throw new AppException(ErrorCode.ARTICLE_NOT_FOUND);
+        }
         articleRepository.deleteById(id);
         commentClient.deleteByArticleId(id);
         aiClient.deleteArticleEmbedding(id);
@@ -132,14 +138,10 @@ public class ArticleService {
     public PageResponse<ArticleResponse> getAllArticlesByCategorySlug(String categorySlug, int page, int size) {
         Sort sort = Sort.by("publishDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        var pageData = articleRepository.findAllByCategory_Slug(categorySlug, pageable);
 
-        var articleList = pageData.getContent().stream()
-                .map(article -> {
-                    var articleResponse = articleMapper.toArticleResponse(article);
-                    articleResponse.setCreated(formatter.format(article.getPublishDate()));
-                    return articleResponse;
-                }).toList();
+        var pageData = articleRepository.findAllByCategory_SlugAndStatus(categorySlug, ArticleStatus.PUBLISHED, pageable);
+
+        var articleList = mapToArticleResponseList(pageData.getContent());
 
         return PageResponse.<ArticleResponse>builder()
                 .currentPage(page)
@@ -199,6 +201,24 @@ public class ArticleService {
         article = articleRepository.save(article);
 
         return articleMapper.toArticleResponse(article);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
+    public PageResponse<ArticleResponse> getAllArticlesForAdmin(int page, int size) {
+        Sort sort = Sort.by("publishDate").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        var pageData = articleRepository.findAllBy(pageable);
+
+        var articleList = mapToArticleResponseList(pageData.getContent());
+
+        return PageResponse.<ArticleResponse>builder()
+                .currentPage(page)
+                .pageSize(size)
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(articleList)
+                .build();
     }
 
 

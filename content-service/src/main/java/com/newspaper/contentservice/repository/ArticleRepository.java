@@ -1,6 +1,7 @@
 package com.newspaper.contentservice.repository;
 
 import com.newspaper.contentservice.entity.Article;
+import com.newspaper.contentservice.entity.ArticleStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +12,6 @@ public interface ArticleRepository extends JpaRepository<Article, String> {
     boolean existsBySlug(String slug);
     Article findBySlug(String slug);
     Page<Article> findAllBy(Pageable pageable);
-    Page<Article> findAllByCategory_Slug(String categorySlug, Pageable pageable);
+    Page<Article> findAllByCategory_SlugAndStatus(String slug, ArticleStatus status, Pageable pageable);
+    Page<Article> findAllByStatus(ArticleStatus status, Pageable pageable);
 }
