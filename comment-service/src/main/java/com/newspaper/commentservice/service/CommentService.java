@@ -52,7 +52,6 @@ public class CommentService {
     }
 
     public PageResponse<CommentResponse> getAllCommentsInArticle(String articleId, int page, int size) {
-        //yeu cau phan trang xuong repo
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page-1, size,sort);
 

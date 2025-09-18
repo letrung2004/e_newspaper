@@ -11,12 +11,14 @@ import com.newspaper.notificationservice.repository.httpclient.EmailClient;
 import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmailService {
     EmailClient emailClient;
@@ -41,6 +43,7 @@ public class EmailService {
         try {
             return emailClient.sendEmail(apiKey, emailRequest);
         } catch (FeignException e) {
+            log.error("Error sending email", e);
             throw new AppException(ErrorCode.CANNOT_SEND_EMAIL);
         }
     }

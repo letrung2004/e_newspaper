@@ -15,7 +15,7 @@ import java.util.List;
 public class UserUpdateRequest {
     String password;
     String firstName;
-    String lastName;
+    String lastName;    
 
     @DobConstraint(min = 10, message = "INVALID_DOB")
     LocalDate dob;

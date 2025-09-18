@@ -62,7 +62,7 @@ public class ArticleController {
     ApiResponse<PageResponse<ArticleResponse>> getArticlesByCategorySlug(
             @PathVariable("categorySlug") String categorySlug,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size" , required = false, defaultValue = "15") int size
+            @RequestParam(value = "size" , required = false, defaultValue = "20") int size
     ) {
         return ApiResponse.<PageResponse<ArticleResponse>>builder()
                 .result(articleService.getAllArticlesByCategorySlug(categorySlug,page,size))

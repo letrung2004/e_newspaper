@@ -38,7 +38,7 @@ public class CommentController {
                 .result(commentService.getAllCommentsInArticle(articleId, page, size))
                 .build();
     }
-    @GetMapping
+    @GetMapping("/all")
     ApiResponse<PageResponse<CommentResponse>> getAllComments(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size" , required = false, defaultValue = "10") int size) {
