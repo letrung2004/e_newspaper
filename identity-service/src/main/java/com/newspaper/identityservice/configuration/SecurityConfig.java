@@ -33,6 +33,9 @@ public class SecurityConfig {
             "/auth/refresh",
             "/auth/outbound/authentication",
             "/internal/username/**",
+
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
 
     @Autowired
