@@ -24,6 +24,8 @@ public class SecurityConfig {
             "article/detail-by-id/**",
             "category", "category/detail/**",
             "tag",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {

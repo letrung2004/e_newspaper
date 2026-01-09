@@ -19,6 +19,8 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/article/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {

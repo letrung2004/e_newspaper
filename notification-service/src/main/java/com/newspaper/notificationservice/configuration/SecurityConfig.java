@@ -18,7 +18,9 @@ public class SecurityConfig {
     private final CustomJwtDecoder customJwtDecoder;
 
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/email/send"
+            "/email/send",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
@@ -38,7 +40,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(PUBLIC_ENDPOINTS)
                 .permitAll()
                 .anyRequest()
                 .authenticated());
